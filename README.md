@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 로그인 및 권한관리 구현
 
-## Getting Started
+## 구현 기능  
 
-First, run the development server:
+- 회원가입
+- oauth 연동(구글, 깃허브)
+- 로그인
+- 권한에 따른 접근 제어
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 기술 스팩
+
+- typescript  
+- 웹 프레임워크: next.js(v15, app route)
+- nextauth
+- 데이터 패칭: SWR
+- UI: shadcn
+- db: sqlite
+- orm: prisma
+- form 처리: react-hook-form
+- 유효성 체크: zod, @hookform/resolvers
+
+```zsh
+npm install next-auth@beta
+npm i swr
+npx shadcn@latest init
+npm install prisma --save-dev
+npx prisma init --datasource-provider sqlite --output ../generated/prisma
+npm install react-hook-form
+npm install @hookform/resolvers
+npm install zod
+npm install @faker-js/faker --save-dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
