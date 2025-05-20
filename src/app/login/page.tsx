@@ -1,5 +1,4 @@
 'use client';
-import { z } from 'zod';
 import {
   Form,
   FormControl,
@@ -16,14 +15,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { LogIn } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
-
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-});
+import { loginSchema, LoginForm } from '@/lib/validations/loginSchema';
+import { login } from '../actions/auth';
+import { startTransition, useActionState } from 'react';
 
 export default function LoginPage() {
-  const form = useForm<z.infer<typeof loginSchema>>({
+  const [state, formAction] = useActionState(login, undefined);
+
+  const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
@@ -31,8 +30,13 @@ export default function LoginPage() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof loginSchema>) => {
-    console.log(values);
+  const onSubmit = (values: LoginForm) => {
+    const formData = new FormData();
+    formData.append('email', values.email);
+    formData.append('password', values.password);
+    startTransition(() => {
+      formAction(formData);
+    });
   };
 
   return (
@@ -61,7 +65,10 @@ export default function LoginPage() {
                         className='bg-gray-50'
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.email?.message ||
+                        state?.errors?.email}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -79,7 +86,10 @@ export default function LoginPage() {
                         className='bg-gray-50'
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.password?.message ||
+                        state?.errors?.password}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -114,7 +124,7 @@ export default function LoginPage() {
             variant='outline'
             className='w-full flex items-center justify-center gap-2'
             onClick={() => {
-              // 실제 OAuth 연동 함수 호출
+              // TODO: 실제 OAuth 연동 함수 호출
               // 예: signIn('google')
             }}
           >

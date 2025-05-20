@@ -1,5 +1,4 @@
 'use client';
-import { z } from 'zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -15,20 +14,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { UserPlus } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
-
-const signupSchema = z
-  .object({
-    email: z.string().email(),
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ['confirmPassword'],
-    message: 'Passwords do not match',
-  });
+import { signup } from '../actions/auth';
+import { signupSchema, SignupForm } from '@/lib/validations/signupSchema';
+import { startTransition, useActionState } from 'react';
 
 export default function Register() {
-  const form = useForm<z.infer<typeof signupSchema>>({
+  const [state, formAction] = useActionState(signup, undefined);
+
+  const form = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       email: '',
@@ -37,8 +30,14 @@ export default function Register() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof signupSchema>) => {
-    console.log(values);
+  const onSubmit = (values: SignupForm) => {
+    const formData = new FormData();
+    formData.append('email', values.email);
+    formData.append('password', values.password);
+    formData.append('confirmPassword', values.confirmPassword);
+    startTransition(() => {
+      formAction(formData);
+    });
   };
 
   return (
@@ -67,7 +66,10 @@ export default function Register() {
                         className='bg-gray-50'
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.email?.message ||
+                        state?.errors?.email}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -85,7 +87,10 @@ export default function Register() {
                         className='bg-gray-50'
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.password?.message ||
+                        state?.errors?.password}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -103,7 +108,10 @@ export default function Register() {
                         className='bg-gray-50'
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage>
+                      {form.formState.errors.confirmPassword?.message ||
+                        state?.errors?.confirmPassword}
+                    </FormMessage>
                   </FormItem>
                 )}
               />
@@ -125,7 +133,7 @@ export default function Register() {
             variant='outline'
             className='w-full flex items-center justify-center gap-2'
             onClick={() => {
-              // 실제 OAuth 연동 함수 호출
+              // TODO: 실제 OAuth 연동 함수 호출
               // 예: signIn('google')
             }}
           >
