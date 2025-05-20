@@ -1,5 +1,27 @@
 # 로그인 및 권한관리 구현
 
+## 오늘의 목표
+
+**2025.05.20**  
+[x] Prisma 모델: User  
+[] 메인창 구현  
+[-] 회원가입창 구현  
+  [x] UI
+  [] 비지니스 로직
+[-] 로그인창 구현  
+  [x] UI
+  [] 비지니스 로직
+[] OAuth 구현  
+[] 권한 접근 제어 구현(admin, user)  
+
+**추가 작업**  
+[] 세션 관리
+
+### 작업 내용
+
+- 구글 아이콘이 없어서 `react-icons` 라이브러리 추가함
+- 
+
 ## 구현 기능  
 
 - 회원가입
@@ -29,4 +51,5 @@ npm install react-hook-form
 npm install @hookform/resolvers
 npm install zod
 npm install @faker-js/faker --save-dev
+npm install react-icons --save
 ```
