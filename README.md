@@ -3,6 +3,7 @@
 ## 오늘의 목표
 
 **2025.05.20**  
+
 - [x] Prisma 모델: User  
 - [ ] 메인창 구현  
 - [ ] 회원가입창 구현  
@@ -12,6 +13,17 @@
 - [ ] 로그인창 구현  
   - [x] UI
   - [x] 유효성 검사 로직 구현
+  - [ ] 비지니스 로직  
+- [x] prisma client, user.repository, user.service 클래스 구현
+- [ ] OAuth 구현  
+- [ ] 권한 접근 제어 구현(admin, user)  
+
+**2025.05.21**  
+
+- [ ] 메인창 구현  
+- [ ] 회원가입창 구현  
+  - [ ] 비지니스 로직
+- [ ] 로그인창 구현  
   - [ ] 비지니스 로직  
 - [x] prisma client, user.repository, user.service 클래스 구현
 - [ ] OAuth 구현  
