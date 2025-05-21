@@ -17,11 +17,15 @@ import { LogIn } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { loginSchema, LoginForm } from '@/lib/validations/loginSchema';
 import { login } from '../actions/auth';
-import { startTransition, useActionState } from 'react';
+import { startTransition, useActionState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
+  // 폼 제출 상태 관리
   const [state, formAction] = useActionState(login, undefined);
+  console.log('🚀 | LoginPage | state:', state);
 
+  // 폼 유효성 검사
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -30,6 +34,7 @@ export default function LoginPage() {
     },
   });
 
+  // 폼 제출 핸들러
   const onSubmit = (values: LoginForm) => {
     const formData = new FormData();
     formData.append('email', values.email);
@@ -38,6 +43,15 @@ export default function LoginPage() {
       formAction(formData);
     });
   };
+
+  // 폼 제출 후 상태 처리
+  useEffect(() => {
+    if (state?.success === false && state?.message) {
+      toast.error(state.message);
+    } else if (state?.success === true && state?.message) {
+      toast.success(state.message);
+    }
+  }, [state]);
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200'>

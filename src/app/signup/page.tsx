@@ -16,11 +16,15 @@ import { UserPlus } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { signup } from '../actions/auth';
 import { signupSchema, SignupForm } from '@/lib/validations/signupSchema';
-import { startTransition, useActionState } from 'react';
+import { startTransition, useActionState, useEffect } from 'react';
+import { toast } from 'sonner';
 
 export default function Register() {
+  // 폼 제출 상태 관리
   const [state, formAction] = useActionState(signup, undefined);
+  console.log('🚀 | Register | state:', state);
 
+  // 폼 유효성 검사
   const form = useForm<SignupForm>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
@@ -30,6 +34,16 @@ export default function Register() {
     },
   });
 
+  // 폼 제출 후 상태 처리
+  useEffect(() => {
+    if (state?.success === false && state?.message) {
+      toast.error(state.message);
+    } else if (state?.success === true && state?.message) {
+      toast.success(state.message);
+    }
+  }, [state]);
+
+  // 폼 제출 핸들러
   const onSubmit = (values: SignupForm) => {
     const formData = new FormData();
     formData.append('email', values.email);

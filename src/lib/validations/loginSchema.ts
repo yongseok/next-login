@@ -13,6 +13,7 @@ export const loginSchema = z.object({
 
 export type LoginFormState =
   | {
+      success?: boolean;
       errors?: {
         email?: string[];
         password?: string[];

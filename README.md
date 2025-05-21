@@ -13,6 +13,7 @@
   - [x] UI
   - [x] 유효성 검사 로직 구현
   - [ ] 비지니스 로직  
+- [x] prisma client, user.repository, user.service 클래스 구현
 - [ ] OAuth 구현  
 - [ ] 권한 접근 제어 구현(admin, user)  
 

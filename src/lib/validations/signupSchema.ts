@@ -19,6 +19,7 @@ export const signupSchema = z
 
 export type SignupFormState =
   | {
+      success?: boolean;
       errors?: {
         name?: string[];
         email?: string[];
