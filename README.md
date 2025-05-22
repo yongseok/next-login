@@ -33,10 +33,11 @@
 
 **2025.05.22**  
 
+- [x] OAuth 구현  
+  - [ ] 🚨 middleware 학습
 - [x] 커스텀 에러 클래스 도입: 🚨 withActionErrorHandler 함수의 제네릭 타입 선언 시 많이 헤맴
 - [ ] 에러 로깅/모니터링
 - [ ] 메인창 구현  
-- [ ] OAuth 구현  
 - [ ] 권한 접근 제어 구현(admin, user)  
 
 **추가 작업**  
@@ -77,4 +78,5 @@ npm install @hookform/resolvers
 npm install zod
 npm install @faker-js/faker --save-dev
 npm install react-icons --save
+npm install next-auth
 ```
