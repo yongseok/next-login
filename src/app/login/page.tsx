@@ -22,9 +22,17 @@ import { toast } from 'sonner';
 
 export default function LoginPage() {
   // 폼 제출 상태 관리
-  const [state, formAction] = useActionState(login, undefined);
+  const [state, formAction] = useActionState(
+    login,
+    {
+      success: false,
+      message: '',
+      errors: {},
+    },
+    undefined
+  );
   console.log('🚀 | LoginPage | state:', state);
-
+  
   // 폼 유효성 검사
   const form = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
@@ -81,7 +89,7 @@ export default function LoginPage() {
                     </FormControl>
                     <FormMessage>
                       {form.formState.errors.email?.message ||
-                        state?.errors?.email}
+                        state?.errors?.email?.[0]}
                     </FormMessage>
                   </FormItem>
                 )}
@@ -102,7 +110,7 @@ export default function LoginPage() {
                     </FormControl>
                     <FormMessage>
                       {form.formState.errors.password?.message ||
-                        state?.errors?.password}
+                        state?.errors?.password?.[0]}
                     </FormMessage>
                   </FormItem>
                 )}

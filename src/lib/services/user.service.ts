@@ -1,5 +1,10 @@
 import { userRepository } from '../database/user.repository';
 import bcrypt from 'bcrypt';
+import {
+  UserNotFoundError,
+  UserOAuthError,
+  UserPasswordMismatchError,
+} from '../errors/userErrors';
 
 class UserService {
   constructor(private userRepo = userRepository) {}
@@ -15,19 +20,21 @@ class UserService {
   async login(user: { email: string; password: string }) {
     const findUser = await this.userRepo.getUserByEmail(user.email);
     if (!findUser) {
-      return { success: false, message: '존재하지 않는 사용자입니다.' };
+      throw new UserNotFoundError();
     }
+
     if (!findUser.password) {
-      return { success: false, message: 'OAuth 로그인 사용자입니다.' };
+      throw new UserOAuthError();
     }
+
     const isPasswordValid = await bcrypt.compare(
       user.password,
       findUser.password as string
     );
+
     if (!isPasswordValid) {
-      return { success: false, message: '비밀번호가 일치하지 않습니다.' };
+      throw new UserPasswordMismatchError();
     }
-    return { success: true, message: '로그인 성공' };
   }
 }
 

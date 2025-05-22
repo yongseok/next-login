@@ -17,14 +17,16 @@ export const signupSchema = z
     message: '비밀번호가 일치하지 않습니다.',
   });
 
+export type SignupFormErrors = {
+  email?: string[];
+  password?: string[];
+  confirmPassword?: string[];
+};
+
 export type SignupFormState =
   | {
       success?: boolean;
-      errors?: {
-        name?: string[];
-        email?: string[];
-        password?: string[];
-      };
+      errors?: SignupFormErrors;
       message?: string;
     }
   | undefined;

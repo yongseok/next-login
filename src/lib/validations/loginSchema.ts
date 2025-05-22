@@ -11,13 +11,15 @@ export const loginSchema = z.object({
     .trim(),
 });
 
+export type LoginFormErrors = {
+  email?: string[];
+  password?: string[];
+};
+
 export type LoginFormState =
   | {
       success?: boolean;
-      errors?: {
-        email?: string[];
-        password?: string[];
-      };
+      errors?: LoginFormErrors;
       message?: string;
     }
   | undefined;
