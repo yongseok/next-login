@@ -28,7 +28,10 @@
 - [ ] 로그인창 구현  
   - [x] 비지니스 로직  
 - [x] prisma client, user.repository, user.service 클래스 구현
-- [ ] OAuth 구현  
+- [ ] OAuth 구현
+  - [x] 미들웨어  
+  - [ ] 회원가입
+  - [ ] 로그인
 - [ ] 권한 접근 제어 구현(admin, user)  
 
 **2025.05.22**  
