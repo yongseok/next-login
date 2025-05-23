@@ -16,14 +16,14 @@ import Link from 'next/link';
 import { LogIn } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { loginSchema, LoginForm } from '@/lib/validations/loginSchema';
-import { login } from '../actions/auth';
+import { signinAction } from '../actions/auth';
 import { startTransition, useActionState, useEffect } from 'react';
 import { toast } from 'sonner';
 
 export default function LoginPage() {
   // 폼 제출 상태 관리
   const [state, formAction] = useActionState(
-    login,
+    signinAction,
     {
       success: false,
       message: '',

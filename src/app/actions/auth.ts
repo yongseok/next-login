@@ -12,8 +12,9 @@ import {
 } from '@/lib/validations/signupSchema';
 import { userService } from '@/lib/services/user.service';
 import { withActionErrorHandler } from '@/lib/errors/actionHandlers';
+import { signIn } from 'next-auth/react';
 
-export const signup = withActionErrorHandler<SignupFormErrors>(
+export const signupAction = withActionErrorHandler<SignupFormErrors>(
   async (_state: SignupFormState, formData: FormData) => {
     // 유효성 검사
     const validatedFields = signupSchema.parse({
@@ -29,7 +30,7 @@ export const signup = withActionErrorHandler<SignupFormErrors>(
   }
 );
 
-export const login = withActionErrorHandler<LoginFormErrors>(
+export const signinAction = withActionErrorHandler<LoginFormErrors>(
   async (_state: LoginFormState, formData: FormData) => {
     // 유효성 검사
     const validatedFields = loginSchema.parse({

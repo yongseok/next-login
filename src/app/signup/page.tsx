@@ -13,18 +13,22 @@ import {
 import { useForm } from 'react-hook-form';
 import { UserPlus } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
-import { signup } from '../actions/auth';
+import { signupAction } from '../actions/auth';
 import { SignupForm } from '@/lib/validations/signupSchema';
 import { startTransition, useActionState, useEffect } from 'react';
 import { toast } from 'sonner';
 
 export default function Register() {
   // 폼 제출 상태 관리
-  const [state, formAction] = useActionState(signup, {
-    success: false,
-    message: '',
-    errors: {},
-  }, undefined);
+  const [state, formAction] = useActionState(
+    signupAction,
+    {
+      success: false,
+      message: '',
+      errors: {},
+    },
+    undefined
+  );
 
   // 폼 유효성 검사
   const form = useForm<SignupForm>({

@@ -37,19 +37,41 @@
 **2025.05.22**  
 
 - [x] OAuth 구현  
-  - [ ] 🚨 middleware 학습
+  - [ ] auth: NextAuth.js v5로 작업(@next-auth/prisma-adapter가 NextAuth.js v5 버전을 미지원 하는걸로 착각해서 삽질함)
 - [x] 커스텀 에러 클래스 도입: 🚨 withActionErrorHandler 함수의 제네릭 타입 선언 시 많이 헤맴
 - [ ] 에러 로깅/모니터링
 - [ ] 메인창 구현  
 - [ ] 권한 접근 제어 구현(admin, user)  
+- [ ] 세션 전략
+  - [ ] jwt
+  - [x] db
+
+**2025.05.23**  
+
+- [진행중] 사용자 인증
+  - [ ] 커스텀 인증 화면
+  - [ ] Credentials(직접 입력)
+- [x] OAuth 구현  
+  - [보류] auth: NextAuth.js v5로 작업(@next-auth/prisma-adapter가 NextAuth.js v5 버전을 미지원 하는걸로 착각해서 삽질함)
+- [ ] 에러 로깅/모니터링
+- [ ] 메인창 구현  
+- [ ] 권한 접근 제어 구현(admin, user)  
+- [보류] 세션 전략
+  - [ ] jwt
+  - [x] db
 
 **추가 작업**  
-[] 세션 관리
+
+- [ ] 세션 관리
+- [ ] 사용자 인증 추가
+  - [ ] 이메일 인증
+  - [ ] Credentials(직접 입력)
+  - [ ] WebAuthn(생체/보안키)
 
 ### 작업 내용
 
 - 구글 아이콘이 없어서 `react-icons` 라이브러리 추가함
-- 
+
 
 ## 구현 기능  
 
@@ -69,6 +91,7 @@
 - orm: prisma
 - form 처리: react-hook-form
 - 유효성 체크: zod, @hookform/resolvers
+- auth: auth.js(v5)
 
 ```zsh
 npm install next-auth@beta
@@ -81,5 +104,7 @@ npm install @hookform/resolvers
 npm install zod
 npm install @faker-js/faker --save-dev
 npm install react-icons --save
-npm install next-auth
+npm install next-auth@beta
+npm install @prisma/client @auth/prisma-adapter
 ```
+
