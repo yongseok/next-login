@@ -1,9 +1,39 @@
 import GoogleProvider from 'next-auth/providers/google';
 import GithubProvider from 'next-auth/providers/github';
 import NextAuth from 'next-auth';
+import { userService } from './lib/services/user.service';
+import Credentials from 'next-auth/providers/credentials';
+import { loginSchema } from './lib/validations/loginSchema';
+import { ZodError } from 'zod';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
+    Credentials({
+      credentials: {
+        email: {
+          label: 'Email',
+          type: 'email',
+          placeholder: 'example@example.com',
+        },
+        password: { label: 'Password', type: 'password' },
+      },
+      authorize: async (credentials) => {
+        try {
+          const { email, password } = await loginSchema.parseAsync(credentials);
+          const user = await userService.login({ email, password });
+          if (!user) {
+            throw new Error('Invalid credentials.');
+          }
+          return user;
+        } catch (error) {
+          if (error instanceof ZodError) {
+            throw error;
+          } else {
+            throw new Error('Invalid credentials.');
+          }
+        }
+      },
+    }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
@@ -33,5 +63,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       session.user.id = token.sub as string;
       return session;
     },
+  },
+  pages: {
+    signIn: '/signin',
   },
 });

@@ -3,7 +3,6 @@
 import {
   LoginFormErrors,
   LoginFormState,
-  loginSchema,
 } from '@/lib/validations/loginSchema';
 import {
   SignupFormErrors,
@@ -12,7 +11,7 @@ import {
 } from '@/lib/validations/signupSchema';
 import { userService } from '@/lib/services/user.service';
 import { withActionErrorHandler } from '@/lib/errors/actionHandlers';
-import { signIn } from 'next-auth/react';
+import { signIn } from '@/auth';
 
 export const signupAction = withActionErrorHandler<SignupFormErrors>(
   async (_state: SignupFormState, formData: FormData) => {
@@ -32,14 +31,15 @@ export const signupAction = withActionErrorHandler<SignupFormErrors>(
 
 export const signinAction = withActionErrorHandler<LoginFormErrors>(
   async (_state: LoginFormState, formData: FormData) => {
-    // 유효성 검사
-    const validatedFields = loginSchema.parse({
+    const result = await signIn('credentials', {
       email: formData.get('email'),
       password: formData.get('password'),
+      redirect: false,
     });
 
-    // 로그인
-    await userService.login(validatedFields);
+    if (!result?.ok) {
+      throw new Error('로그인에 실패했습니다.');
+    }
 
     return { success: true, message: '로그인 성공' };
   }

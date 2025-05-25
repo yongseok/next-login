@@ -49,8 +49,8 @@
 **2025.05.23**  
 
 - [진행중] 사용자 인증
+  - [진행중] Credentials(직접 입력)
   - [ ] 커스텀 인증 화면
-  - [ ] Credentials(직접 입력)
 - [x] OAuth 구현  
   - [보류] auth: NextAuth.js v5로 작업(@next-auth/prisma-adapter가 NextAuth.js v5 버전을 미지원 하는걸로 착각해서 삽질함)
 - [ ] 에러 로깅/모니터링

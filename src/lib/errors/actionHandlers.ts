@@ -2,6 +2,7 @@ import { ZodError } from 'zod';
 import { AppError } from './errors';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { ActionResponse } from '@/types/server/error';
+import { AuthError } from 'next-auth';
 
 /**
  * 액션 오류 응답 생성 함수
@@ -16,6 +17,17 @@ export function createActionErrorResponse<Errors = unknown>(
       success: false,
       message: error.issues?.[0]?.message ?? '알 수 없는 유효성 검사 오류',
       errors: error.flatten().fieldErrors as Errors,
+    };
+  }
+
+  if (error instanceof AuthError) {
+    if (error.cause?.err instanceof ZodError) {
+      return createActionErrorResponse(error.cause.err, isProd);
+    }
+    return {
+      success: false,
+      message: error.message,
+      details: isProd ? undefined : error.cause,
     };
   }
 
@@ -46,9 +58,15 @@ export function createActionErrorResponse<Errors = unknown>(
  * 액션 오류 핸들러 미들웨어
  */
 export function withActionErrorHandler<Errors = unknown>(
-  handler: (state: ActionResponse<Errors>, formData: FormData) => Promise<ActionResponse<Errors>>
+  handler: (
+    state: ActionResponse<Errors>,
+    formData: FormData
+  ) => Promise<ActionResponse<Errors>>
 ) {
-  return async (state: ActionResponse<Errors>, formData: FormData): Promise<ActionResponse<Errors>> => {
+  return async (
+    state: ActionResponse<Errors>,
+    formData: FormData
+  ): Promise<ActionResponse<Errors>> => {
     try {
       return await handler(state, formData);
     } catch (error) {

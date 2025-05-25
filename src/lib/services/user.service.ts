@@ -29,12 +29,14 @@ class UserService {
 
     const isPasswordValid = await bcrypt.compare(
       user.password,
-      findUser.password as string
+      findUser.password
     );
 
     if (!isPasswordValid) {
       throw new UserPasswordMismatchError();
     }
+
+    return findUser;
   }
 }
 
