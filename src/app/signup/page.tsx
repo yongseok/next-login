@@ -17,6 +17,7 @@ import { signupAction } from '../actions/auth';
 import { SignupForm } from '@/lib/validations/signupSchema';
 import { startTransition, useActionState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { signIn } from 'next-auth/react';
 
 export default function Register() {
   // 폼 제출 상태 관리
@@ -152,8 +153,9 @@ export default function Register() {
             variant='outline'
             className='w-full flex items-center justify-center gap-2'
             onClick={() => {
-              // TODO: 실제 OAuth 연동 함수 호출
-              // 예: signIn('google')
+              signIn('google', {
+                redirectTo: '/',
+              });
             }}
           >
             <FcGoogle className='w-5 h-5' />

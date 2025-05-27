@@ -37,7 +37,7 @@ export const signinAction = withActionErrorHandler<LoginFormErrors>(
       redirect: false,
     });
 
-    if (!result?.ok) {
+    if (!result) {
       throw new Error('로그인에 실패했습니다.');
     }
 

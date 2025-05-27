@@ -5,6 +5,7 @@ import { userService } from './lib/services/user.service';
 import Credentials from 'next-auth/providers/credentials';
 import { loginSchema } from './lib/validations/loginSchema';
 import { ZodError } from 'zod';
+import { Role } from '@prisma/client';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -29,7 +30,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           if (error instanceof ZodError) {
             throw error;
           } else {
-            throw new Error('Invalid credentials.');
+            console.error('🚀 | authorize: | error:', error);
+            return null;
           }
         }
       },
@@ -57,14 +59,55 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     strategy: 'jwt',
   },
   callbacks: {
+    // 로그인 시 사용자 정보 생성
+    // 호출 시점: 로그인 시 호출
+    async signIn({ user }) {
+      try {
+        if (user.email) {
+          const findUser = await userService.getUserByEmail(user.email);
+          if (!findUser) {
+            await userService.signup({
+              email: user.email,
+              name: user.name,
+              password: '',
+              role: Role.USER,
+            });
+          }
+        }
+        return true;
+      } catch (error) {
+        console.error('🚀 | signIn | error:', error);
+        return false;
+      }
+    },
+    // 사용자 정보 생성 후 토큰 생성
+    // 호출 시점: 사용자 정보 생성 후 호출
+    async jwt({ token, user }) {
+      if (user && user.email) {
+        if (user.role) {
+          token.role = user.role;
+        } else {
+          try {
+            const findUser = await userService.getUserByEmail(user.email);
+            if (findUser) {
+              token.role = findUser.role;
+            }
+          } catch (error) {
+            console.error('🚀 | jwt | error:', error);
+          }
+        }
+      }
+      return token;
+    },
+    // 세션 생성 시 사용자 정보 추가
+    // 호출 시점: 세션 생성 시 호출(useSession(), auth() 호출 시)
     async session({ session, token }) {
-      // console.log('🚀 | session | session:', session);
-      // console.log('🚀 | session | token:', token);
-      session.user.id = token.sub as string;
+      session.user.id = token.id as string;
+      session.user.role = token.role as Role;
       return session;
     },
   },
   pages: {
-    signIn: '/signin',
+    signIn: '/login',
   },
 });

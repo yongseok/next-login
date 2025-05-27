@@ -3,6 +3,11 @@ import { z } from 'zod';
 export const signupSchema = z
   .object({
     email: z.string().email({ message: '이메일 형식이 올바르지 않습니다.' }),
+    name: z
+      .string()
+      .min(2, { message: '이름은 2자 이상이어야 합니다.' })
+      .optional(),
+    role: z.enum(['user', 'admin']),
     password: z
       .string()
       .min(8, { message: '비밀번호는 8자 이상이어야 합니다.' })
@@ -19,6 +24,8 @@ export const signupSchema = z
 
 export type SignupFormErrors = {
   email?: string[];
+  name?: string[];
+  role?: string[];
   password?: string[];
   confirmPassword?: string[];
 };

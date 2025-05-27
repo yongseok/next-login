@@ -3,7 +3,7 @@ import { getRoutes } from '@/lib/getRoutes';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
-import { UserButton } from './UserButton';
+import { UserSheet } from './UserSheet';
 
 export function MainNavigation() {
   const pathname = usePathname();
@@ -18,7 +18,7 @@ export function MainNavigation() {
         ))}
       </div>
       <div className='flex items-center gap-4'>
-        <UserButton />
+        <UserSheet />
         <div className='flex md:hidden items-center gap-4'>
           <div>모바일 메뉴</div>
         </div>

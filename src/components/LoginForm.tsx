@@ -4,15 +4,28 @@ import { signinAction } from '@/app/actions/auth';
 import { LoginFormErrors } from '@/lib/validations/loginSchema';
 import { useState } from 'react';
 import { LogIn } from 'lucide-react';
-import { FcGoogle } from 'react-icons/fc';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { signIn } from 'next-auth/react';
+import LoginButton from './LoginButton';
+import AuthFields from './AuthFields';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import {
+  LoginForm as UserLoginForm,
+  loginSchema,
+} from '@/lib/validations/loginSchema';
+import { Form } from './ui/form';
 
-export default function SigninForm() {
+export default function LoginForm() {
   const [error, setError] = useState<LoginFormErrors | null>(null);
+  const form = useForm<UserLoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  });
 
   async function onSubmit(formData: FormData) {
     try {
@@ -24,7 +37,10 @@ export default function SigninForm() {
         },
         formData
       );
-      if (!result.success) {
+
+      if (result.success) {
+        window.location.href = '/';
+      } else {
         if (result.errors) {
           setError(result.errors);
         } else {
@@ -47,67 +63,32 @@ export default function SigninForm() {
           <p className='text-gray-500 text-sm'>계정에 로그인하세요</p>
         </CardHeader>
         <CardContent>
-          <form action={onSubmit} className='space-y-4'>
-            <div className='space-y-2'>
-              <label htmlFor='email' className='text-sm font-medium'>
-                Email
-              </label>
-              <Input
-                type='email'
-                name='email'
-                placeholder='이메일을 입력하세요'
-                className='bg-gray-50'
-              />
-              {error?.email && (
-                <p className='text-sm text-red-500'>{error.email}</p>
-              )}
-            </div>
-            <div className='space-y-2'>
-              <label htmlFor='password' className='text-sm font-medium'>
-                Password
-              </label>
-              <Input
-                type='password'
-                name='password'
-                placeholder='비밀번호를 입력하세요'
-                className='bg-gray-50'
-              />
-              {error?.password && (
-                <p className='text-sm text-red-500'>{error.password}</p>
-              )}
-            </div>
-            <Button
-              type='submit'
-              className='w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold'
-            >
-              로그인
-            </Button>
+          <Form {...form}>
+            <form action={onSubmit} className='space-y-4'>
+              <AuthFields form={form} errors={error} />
+              <Button
+                type='submit'
+                className='w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold'
+              >
+                로그인
+              </Button>
+            </form>
             <div className='flex justify-between items-center mt-2'>
               <span className='text-sm text-gray-500'>계정이 없으신가요?</span>
               <Button type='button' variant='outline' asChild className='ml-2'>
                 <Link href='/signup'>회원가입</Link>
               </Button>
             </div>
-          </form>
+          </Form>
           <div className='my-4 flex items-center'>
             <div className='flex-grow h-px bg-gray-200' />
             <span className='mx-2 text-gray-400 text-xs'>또는</span>
             <div className='flex-grow h-px bg-gray-200' />
           </div>
-          <Button
-            type='button'
-            variant='outline'
-            className='w-full flex items-center justify-center gap-2'
-            onClick={() => {
-              signIn('google', {
-                redirect: true,
-                callbackUrl: '/',
-              });
-            }}
-          >
-            <FcGoogle className='w-5 h-5' />
-            <span className='font-medium'>Google로 로그인</span>
-          </Button>
+          <div className='flex flex-col gap-2'>
+            <LoginButton provider='google' redirect={true} redirectTo='/' />
+            <LoginButton provider='github' redirect={true} redirectTo='/' />
+          </div>
         </CardContent>
       </Card>
     </div>

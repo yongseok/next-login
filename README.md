@@ -60,6 +60,19 @@
   - [ ] jwt
   - [x] db
 
+**2025.05.27**  
+
+- [x] 세션 관리 정책: jwt
+  - 추후 database로 변경 예정: 계정 연결 및 데이터 영속성 부족 등의 이유로 변경 예정
+  - 현재는 email을 고유 아이디로 하여 oauth의 email이 같으면 동일 사용자로 간주한다.
+- [x] 사용자 Role 선택
+
+**2025.05.28**  
+
+- [ ] 사용자 업데이트 로직 구현
+  - [ ] 서버 엔드 포인트 구현
+  - [ ] 클라이언트 통신 custom hooks 구현(SWR)
+
 **추가 작업**  
 
 - [ ] 세션 관리
@@ -71,7 +84,6 @@
 ### 작업 내용
 
 - 구글 아이콘이 없어서 `react-icons` 라이브러리 추가함
-
 
 ## 구현 기능  
 
@@ -107,4 +119,3 @@ npm install react-icons --save
 npm install next-auth@beta
 npm install @prisma/client @auth/prisma-adapter
 ```
-

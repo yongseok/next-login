@@ -52,6 +52,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
   sessions      Session[]
+  role          Role    @default(USER)
 }
 
 model VerificationToken {
@@ -62,4 +63,9 @@ model VerificationToken {
   updatedAt  DateTime @updatedAt
 
   @@unique([identifier, token])
+}
+
+enum Role {
+  USER
+  ADMIN
 }
