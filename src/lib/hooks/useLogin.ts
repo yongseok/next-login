@@ -27,6 +27,7 @@ export const useLogin = (): UseLoginReturn => {
     try {
       await signIn(provider, {
         redirect: true,
+        redirectTo: '/profile',
       });
     } catch (error) {
       console.error('Login error:', error);
