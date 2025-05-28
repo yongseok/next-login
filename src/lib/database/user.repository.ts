@@ -20,10 +20,10 @@ export class UserRepository {
   }
 
   async updateUser(
-    id: string,
+    email: string,
     data: Partial<Prisma.UserUpdateInput>
   ): Promise<User> {
-    return this.prisma.user.update({ where: { id }, data });
+    return this.prisma.user.update({ where: { email }, data });
   }
 
   async deleteUser(id: string): Promise<void> {

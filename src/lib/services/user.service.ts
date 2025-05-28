@@ -56,11 +56,11 @@ class UserService {
 
   async updateUser(user: UserUpdateDto) {
     const findUser = await this.userRepo.getUserByEmail(user.email);
-    if (!findUser) {
+    if (!findUser || !findUser.email) {
       throw new UserNotFoundError();
     }
 
-    return await this.userRepo.updateUser(findUser.id, user);
+    return await this.userRepo.updateUser(findUser.email, user);
   }
 }
 

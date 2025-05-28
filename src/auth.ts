@@ -82,7 +82,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     // 사용자 정보 생성 후 토큰 생성
     // 호출 시점: 사용자 정보 생성 후 호출
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      // sessionUpdate 호출 시
+      if (trigger === 'update' && session) {
+        return { ...token, ...session.user };
+      }
+
       if (user && user.email) {
         if (user.role) {
           token.role = user.role;

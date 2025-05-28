@@ -1,4 +1,4 @@
-import { Menu } from 'lucide-react';
+import { Loader2, Menu } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   Sheet,
@@ -25,7 +25,6 @@ import {
   SelectValue,
 } from './ui/select';
 import { Input } from './ui/input';
-import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useForm } from 'react-hook-form';
 import {
@@ -36,10 +35,12 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { Role } from '@prisma/client';
+import { useUpdateUser } from '@/lib/swr/useUsers';
 
 export function UserSheet() {
-  const { data: session, status } = useSession();
-  console.log('🚀 | UserSheet | session:', session);
+  const { data: session } = useSession();
+  const { userUpdateTrigger, userUpdateIsMutating, userUpdateError } =
+    useUpdateUser(session?.user?.email ?? '');
 
   const form = useForm<UserUpdateDto>({
     resolver: zodResolver(userUpdateSchema),
@@ -63,14 +64,13 @@ export function UserSheet() {
     }
   }, [session, form]);
 
-  if (status === 'loading') {
+  if (session === null) {
     return <div>Loading...</div>;
   }
 
   const onSubmit = async (data: UserUpdateDto) => {
     try {
-      // TODO: 여기서 업데이트 요청을 보내야 함
-      console.log('🚀 | onSubmit | data:', data);
+      userUpdateTrigger(data);
     } catch (error) {
       console.error('🚀 | onSubmit | error:', error);
     }
@@ -153,7 +153,16 @@ export function UserSheet() {
                 )}
               />
               <div className='flex justify-end'>
-                <Button type='submit'>저장</Button>
+                <Button type='submit' disabled={userUpdateIsMutating}>
+                  {userUpdateIsMutating ? (
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                  ) : (
+                    '저장'
+                  )}
+                </Button>
+                {userUpdateError && (
+                  <p className='text-red-500'>{userUpdateError.message}</p>
+                )}
               </div>
             </form>
           </Form>
