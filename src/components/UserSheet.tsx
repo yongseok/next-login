@@ -105,7 +105,7 @@ export function UserSheet() {
                         {...field}
                         className='disabled:opacity-100'
                         value={field.value}
-                        disabled
+                        disabled={true}
                       />
                     </FormControl>
                     <FormMessage>{errors.email?.message}</FormMessage>

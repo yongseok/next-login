@@ -13,7 +13,7 @@ import { LoginFormErrors } from '@/lib/validations/loginSchema';
 
 interface AuthFieldsProps<T extends FieldValues> {
   form: UseFormReturn<T>;
-  errors: LoginFormErrors | null;
+  errors?: LoginFormErrors | null;
 }
 
 export default function AuthFields<T extends FieldValues>({
@@ -35,13 +35,16 @@ export default function AuthFields<T extends FieldValues>({
                 className='bg-gray-50'
               />
             </FormControl>
-            <FormMessage>
-              {typeof form.formState.errors.email?.message === 'string'
-                ? form.formState.errors.email?.message
-                : typeof errors?.email?.[0] === 'string'
-                ? errors?.email[0]
-                : undefined}
-            </FormMessage>
+            <FormMessage />
+            {errors?.email ? (
+              <p className='text-sm font-medium text-destructive'>
+                {errors.email}
+              </p>
+            ) : form.formState.errors.email?.message ? (
+              <p className='text-sm font-medium text-destructive'>
+                {form.formState.errors.email?.message.toString()}
+              </p>
+            ) : null}
           </FormItem>
         )}
       />
@@ -59,13 +62,16 @@ export default function AuthFields<T extends FieldValues>({
                 className='bg-gray-50'
               />
             </FormControl>
-            <FormMessage>
-              {typeof form.formState.errors.password?.message === 'string'
-                ? form.formState.errors.password?.message
-                : typeof errors?.password?.[0] === 'string'
-                ? errors?.password[0]
-                : undefined}
-            </FormMessage>
+            <FormMessage />
+            {errors?.password ? (
+              <p className='text-sm font-medium text-destructive'>
+                {errors.password}
+              </p>
+            ) : form.formState.errors.password?.message ? (
+              <p className='text-sm font-medium text-destructive'>
+                {form.formState.errors.password?.message.toString()}
+              </p>
+            ) : null}
           </FormItem>
         )}
       />
