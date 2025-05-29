@@ -88,19 +88,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return { ...token, ...session.user };
       }
 
-      if (user && user.email) {
-        if (user.role) {
-          token.role = user.role;
-        } else {
-          try {
-            const findUser = await userService.getUserByEmail(user.email);
-            if (findUser) {
-              token.role = findUser.role;
-            }
-          } catch (error) {
-            console.error('🚀 | jwt | error:', error);
-          }
-        }
+      if (user && user.role) {
+        token.role = user.role;
       }
       return token;
     },
