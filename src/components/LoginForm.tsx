@@ -4,7 +4,7 @@ import { Loader2, LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import LoginButton from './LoginButton';
+import LoginButton from './OAuthButton';
 import AuthFields from './AuthFields';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

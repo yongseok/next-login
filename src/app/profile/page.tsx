@@ -1,5 +1,4 @@
-import { auth, signOut } from '@/auth';
-import { Button } from '@/components/ui/button';
+import { auth } from '@/auth';
 import { userService } from '@/lib/services/user.service';
 import { UserCircleIcon } from 'lucide-react';
 import LogoutButton from './components/LogoutButton';
