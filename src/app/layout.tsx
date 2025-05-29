@@ -4,6 +4,7 @@ import './globals.css';
 import { MainNavigation } from '@/components/MainNavigation';
 import { Toaster } from '@/components/ui/sonner';
 import { AuthProvider } from '@/app/authProvider';
+import { ThemeProvider } from 'next-themes';
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -30,9 +31,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
-          <MainNavigation />
-          {children}
-          <Toaster />
+          <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+            <MainNavigation />
+            {children}
+            <Toaster />
+          </ThemeProvider>
         </AuthProvider>
       </body>
     </html>

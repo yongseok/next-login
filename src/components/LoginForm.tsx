@@ -29,11 +29,11 @@ export default function LoginForm() {
   });
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200'>
+    <div className='min-h-screen flex items-center justify-center'>
       <Card className='w-full max-w-md shadow-xl'>
         <CardHeader className='flex flex-col items-center gap-2'>
-          <div className='bg-indigo-100 rounded-full p-3'>
-            <LogIn className='w-8 h-8 text-indigo-500' />
+          <div className='bg-primary rounded-full p-3'>
+            <LogIn className='w-8 h-8 text-primary-foreground' />
           </div>
           <CardTitle className='text-2xl font-bold'>로그인</CardTitle>
           <p className='text-gray-500 text-sm'>계정에 로그인하세요</p>
@@ -45,7 +45,7 @@ export default function LoginForm() {
               <Button
                 type='submit'
                 disabled={form.formState?.isLoading || isLoading}
-                className='w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold'
+                className='w-full bg-primary'
               >
                 {form.formState?.isLoading || isLoading ? (
                   <Loader2 className='w-5 h-5 animate-spin' />
