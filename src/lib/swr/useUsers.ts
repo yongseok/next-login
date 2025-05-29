@@ -1,8 +1,9 @@
 import { useSession } from 'next-auth/react';
 import { API_ENDPOINTS } from '../config/api';
-import { updateUser } from './fetcher';
+import { getUserByEmail, updateUser } from './fetcher';
 import useSWRMutation from 'swr/mutation';
 import { UserUpdateDto } from '../validations/userUpdateSchema';
+import useSWR from 'swr';
 
 export const useUpdateUser = (email: string) => {
   const encodedEmail = encodeURIComponent(email);
@@ -31,5 +32,19 @@ export const useUpdateUser = (email: string) => {
     userUpdateTrigger: trigger,
     userUpdateIsMutating: isMutating,
     userUpdateError: error,
+  };
+};
+
+export const useGetUserByEmail = (email: string) => {
+  const encodedEmail = encodeURIComponent(email);
+  const { data, error, isLoading } = useSWR(
+    API_ENDPOINTS.USERS.GET(encodedEmail),
+    getUserByEmail,
+  );
+
+  return {
+    user: data,
+    userError: error,
+    isLoading,
   };
 };

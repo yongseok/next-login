@@ -78,9 +78,12 @@ export default function LoginForm() {
           </div>
           <div className='flex justify-between items-center mt-2'>
             <span className='text-sm text-gray-500'>계정이 없으신가요?</span>
-            <Button type='button' variant='outline' asChild className='ml-2'>
-              <Link href='/signup'>회원가입</Link>
-            </Button>
+            <Link
+              href='/signup'
+              className='text-sm text-primary underline underline-offset-2'
+            >
+              회원가입
+            </Link>
           </div>
         </CardContent>
       </Card>

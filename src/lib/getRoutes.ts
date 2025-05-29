@@ -1,4 +1,4 @@
-import { Home, Info, LogIn } from 'lucide-react';
+import { Home, Info } from 'lucide-react';
 
 export const getRoutes = (pathname: string) => {
   const routes = [
@@ -7,12 +7,6 @@ export const getRoutes = (pathname: string) => {
       label: 'Home',
       icon: Home,
       active: pathname === '/',
-    },
-    {
-      href: '/login',
-      label: 'Login',
-      icon: LogIn,
-      active: pathname === '/login',
     },
     {
       href: '/about',

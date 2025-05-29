@@ -7,3 +7,8 @@ export const updateUser = async (url: string, data: UserUpdateDto) => {
   });
   return response.json();
 };
+
+export const getUserByEmail = async (url: string) => {
+  const response = await fetch(url);
+  return response.json();
+};
