@@ -11,17 +11,31 @@ interface UseLoginReturn {
   isLoading: boolean;
   currentProvider: Provider | null;
   error: LoginFormErrors | null;
-  handleOAuthLogin: (provider: Provider) => Promise<void>;
-  handleCredentialsLogin: (formData: FormData) => Promise<void>;
+  loginWithOAuth: (provider: Provider) => Promise<void>;
+  loginWithCredentials: (formData: FormData) => Promise<void>;
 }
 
+/**
+ * 사용 예시:
+ * ```tsx
+ * const { isLoading, loginWithOAuth, loginWithCredentials, error } = useLogin();
+ *
+ * <LoginForm
+ *  isLoading={isLoading}
+ *  loginWithOAuth={loginWithOAuth}
+ *  loginWithCredentials={loginWithCredentials}
+ *  error={error}
+ * />
+ * ```
+ */
 export const useLogin = (): UseLoginReturn => {
   const [isLoading, setIsLoading] = useState(false);
   const [currentProvider, setCurrentProvider] = useState<Provider | null>(null);
   const [error, setError] = useState<LoginFormErrors | null>(null);
 
   // OAuth 로그인 처리
-  const handleOAuthLogin = async (provider: Provider) => {
+  const loginWithOAuth = async (provider: Provider) => {
+    setError(null);
     setIsLoading(true);
     setCurrentProvider(provider);
     try {
@@ -43,7 +57,9 @@ export const useLogin = (): UseLoginReturn => {
   };
 
   // 자격 증명 로그인 처리
-  const handleCredentialsLogin = async (formData: FormData) => {
+  const loginWithCredentials = async (formData: FormData) => {
+    setError(null);
+    setIsLoading(true);
     try {
       const result = await signinAction(
         {
@@ -60,11 +76,15 @@ export const useLogin = (): UseLoginReturn => {
         if (result.errors) {
           setError(result.errors);
         } else {
-          console.error('Form submission error:', result.message);
+          setError({
+            CredentialsError: result.message,
+          });
         }
       }
     } catch (error) {
-      console.error('Form submission error:', error);
+      console.error('🚨 Form submission error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -72,7 +92,7 @@ export const useLogin = (): UseLoginReturn => {
     isLoading,
     currentProvider,
     error,
-    handleOAuthLogin,
-    handleCredentialsLogin,
+    loginWithOAuth,
+    loginWithCredentials,
   };
 };

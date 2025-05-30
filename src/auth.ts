@@ -4,10 +4,10 @@ import NextAuth from 'next-auth';
 import { userService } from './lib/services/user.service';
 import Credentials from 'next-auth/providers/credentials';
 import { loginSchema } from './lib/validations/loginSchema';
-import { ZodError } from 'zod';
 import { Role } from '@prisma/client';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  debug: true,
   providers: [
     Credentials({
       credentials: {
@@ -19,21 +19,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       authorize: async (credentials) => {
-        try {
-          const { email, password } = await loginSchema.parseAsync(credentials);
-          const user = await userService.login({ email, password });
-          if (!user) {
-            throw new Error('Invalid credentials.');
-          }
-          return user;
-        } catch (error) {
-          if (error instanceof ZodError) {
-            throw error;
-          } else {
-            console.error('🚀 | authorize: | error:', error);
-            return null;
-          }
-        }
+        const { email, password } = await loginSchema.parseAsync(credentials);
+        return await userService.login({ email, password });
       },
     }),
     GoogleProvider({

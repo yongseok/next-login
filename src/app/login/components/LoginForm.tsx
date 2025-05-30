@@ -4,22 +4,33 @@ import { Loader2, LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import LoginButton from './OAuthButton';
-import AuthFields from './AuthFields';
+import LoginButton from '../../../components/OAuthButton';
+import AuthFields from '../../../components/AuthFields';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   LoginForm as UserLoginForm,
   loginSchema,
 } from '@/lib/validations/loginSchema';
-import { Form } from './ui/form';
-import { useSession } from 'next-auth/react';
-import { useLogin } from '@/lib/hooks/useLogin';
+import { Form } from '../../../components/ui/form';
+import { LoginFormErrors } from '@/lib/validations/loginSchema';
+import { Session } from 'next-auth';
 
-export default function LoginForm() {
-  const { data: session } = useSession();
-  const { isLoading, handleOAuthLogin, handleCredentialsLogin, error } =
-    useLogin();
+interface LoginFormProps {
+  isLoading: boolean;
+  loginWithOAuth: (provider: 'google' | 'github') => Promise<void>;
+  loginWithCredentials: (formData: FormData) => Promise<void>;
+  error: LoginFormErrors | null;
+  session: Session | null;
+}
+
+export default function LoginForm({
+  isLoading,
+  loginWithOAuth,
+  loginWithCredentials,
+  error,
+  session,
+}: LoginFormProps) {
   const form = useForm<UserLoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -40,8 +51,11 @@ export default function LoginForm() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form action={handleCredentialsLogin} className='space-y-4'>
+            <form action={loginWithCredentials} className='space-y-4'>
               <AuthFields form={form} errors={error} />
+              {error?.CredentialsError && (
+                <p className='text-red-500 text-sm'>{error.CredentialsError}</p>
+              )}
               <Button
                 type='submit'
                 disabled={form.formState?.isLoading || isLoading}
@@ -63,13 +77,13 @@ export default function LoginForm() {
             <LoginButton
               provider='google'
               isLoading={isLoading}
-              onClick={() => handleOAuthLogin('google')}
+              onClick={() => loginWithOAuth('google')}
               session={session}
             />
             <LoginButton
               provider='github'
               isLoading={isLoading}
-              onClick={() => handleOAuthLogin('github')}
+              onClick={() => loginWithOAuth('github')}
               session={session}
             />
             {error?.OAuthError && (

@@ -1,12 +1,12 @@
 import { userRepository } from '../database/user.repository';
-import bcrypt from 'bcrypt';
 import {
   UserNotFoundError,
   UserOAuthError,
   UserPasswordMismatchError,
 } from '../errors/userErrors';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { UserUpdateDto } from '../validations/userUpdateSchema';
+import { verifyPassword, hashPassword } from '../password';
 
 class UserService {
   constructor(private userRepo = userRepository) {}
@@ -18,17 +18,17 @@ class UserService {
     role: Role;
   }) {
     const hashedPassword = user.password
-      ? await bcrypt.hash(user.password, 10)
+      ? await hashPassword(user.password)
       : null;
     await this.userRepo.createUser({
       email: user.email,
       password: hashedPassword,
       name: user.name,
-      role: user.role ?? Role.USER,
+      role: user.role,
     });
   }
 
-  async login(user: { email: string; password: string }) {
+  async login(user: { email: string; password: string }): Promise<User> {
     const findUser = await this.userRepo.getUserByEmail(user.email);
     if (!findUser) {
       throw new UserNotFoundError();
@@ -38,7 +38,7 @@ class UserService {
       throw new UserOAuthError();
     }
 
-    const isPasswordValid = await bcrypt.compare(
+    const isPasswordValid = await verifyPassword(
       user.password,
       findUser.password
     );

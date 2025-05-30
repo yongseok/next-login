@@ -48,6 +48,7 @@ export default function Register() {
       toast.success(state.message);
     }
   }, [state]);
+  console.log('🚀 | Register | state:', state);
 
   // 폼 제출 핸들러
   const onSubmit = (values: SignupForm) => {

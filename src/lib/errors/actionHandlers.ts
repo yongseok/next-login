@@ -21,9 +21,13 @@ export function createActionErrorResponse<Errors = unknown>(
   }
 
   if (error instanceof AuthError) {
-    if (error.cause?.err instanceof ZodError) {
+    if (
+      error.cause?.err instanceof ZodError ||
+      error.cause?.err instanceof AppError
+    ) {
       return createActionErrorResponse(error.cause.err, isProd);
     }
+
     return {
       success: false,
       message: error.message,

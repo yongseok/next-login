@@ -15,6 +15,7 @@ export interface LoginFormErrors {
   email?: string[];
   password?: string[];
   OAuthError?: string;
+  CredentialsError?: string;
 }
 
 export type LoginFormState =
