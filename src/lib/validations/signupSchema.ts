@@ -1,4 +1,3 @@
-import { Role } from '@prisma/client';
 import { z } from 'zod';
 
 export const signupSchema = z
@@ -8,7 +7,6 @@ export const signupSchema = z
       .string()
       .min(2, { message: '이름은 2자 이상이어야 합니다.' })
       .optional(),
-    role: z.enum([Role.USER, Role.ADMIN]),
     password: z
       .string()
       .min(8, { message: '비밀번호는 8자 이상이어야 합니다.' })
@@ -26,7 +24,6 @@ export const signupSchema = z
 export type SignupFormErrors = {
   email?: string[];
   name?: string[];
-  role?: string[];
   password?: string[];
   confirmPassword?: string[];
 };

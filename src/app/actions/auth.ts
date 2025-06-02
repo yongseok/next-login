@@ -17,10 +17,9 @@ export const signupAction = withActionErrorHandler<SignupFormErrors>(
         email: formData.get('email'),
         password: formData.get('password'),
         confirmPassword: formData.get('confirmPassword'),
-        role: formData.get('role') ?? Role.USER,
       });
       // 회원 등록
-      await userService.signup(validatedFields);
+      await userService.signup({ ...validatedFields, role: Role.USER });
 
       return { success: true, message: '회원가입 성공' };
     } catch (error) {

@@ -10,69 +10,39 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
 import { UserPlus } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
-import { signupAction } from '@/app/actions/auth';
-import { SignupForm as SignupFormType } from '@/lib/validations/signupSchema';
-import { startTransition, useActionState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { toast } from 'sonner';
 import { signIn } from 'next-auth/react';
+import useSignup from '@/lib/hooks/useSignup';
 
 export default function SignupForm() {
-  // 폼 제출 상태 관리
-  const [state, formAction] = useActionState(
-    signupAction,
-    {
-      success: false,
-      message: '',
-      errors: {},
-    },
-    undefined
-  );
-
-  // 폼 유효성 검사
-  const form = useForm<SignupFormType>({
-    defaultValues: {
-      email: '',
-      password: '',
-      confirmPassword: '',
-    },
-  });
+  const { isLoading, error, form, signup } = useSignup();
+  console.log('🚀 | SignupForm | error:', error);
 
   // 폼 제출 후 상태 처리
-  useEffect(() => {
-    if (state?.success === false && state?.message) {
-      toast.error(state.message);
+  // useEffect(() => {
+  //   if (state?.success === false && state?.message) {
+  //     toast.error(state.message);
 
-      if (
-        state.message.includes('이미 존재하는 이메일입니다.') ||
-        state.message.includes('사용자를 찾을 수 없습니다.')
-      ) {
-        form.setFocus('email');
-        form.setError('email', { message: state.message });
-      }
-    } else if (state?.success === true && state?.message) {
-      toast.success(state.message);
-      signIn('credentials', {
-        email: form.getValues('email'),
-        password: form.getValues('password'),
-        redirect: true,
-        redirectTo: '/',
-      });
-    }
-  }, [state, form]);
-
-  // 폼 제출 핸들러
-  const onSubmit = (values: SignupFormType) => {
-    const formData = new FormData();
-    formData.append('email', values.email);
-    formData.append('password', values.password);
-    formData.append('confirmPassword', values.confirmPassword);
-    startTransition(() => {
-      formAction(formData);
-    });
-  };
+  //     if (
+  //       state.message.includes('이미 존재하는 이메일입니다.') ||
+  //       state.message.includes('사용자를 찾을 수 없습니다.')
+  //     ) {
+  //       form.setFocus('email');
+  //       form.setError('email', { message: state.message });
+  //     }
+  //   } else if (state?.success === true && state?.message) {
+  //     toast.success(state.message);
+  //     signIn('credentials', {
+  //       email: form.getValues('email'),
+  //       password: form.getValues('password'),
+  //       redirect: true,
+  //       redirectTo: '/',
+  //     });
+  //   }
+  // }, [state, form]);
 
   return (
     <div className='min-h-screen flex items-center justify-center'>
@@ -86,7 +56,12 @@ export default function SignupForm() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+            <form
+              onSubmit={form.handleSubmit((data) => {
+                signup('credentials', data);
+              })}
+              className='space-y-4'
+            >
               <FormField
                 control={form.control}
                 name='email'
@@ -101,8 +76,8 @@ export default function SignupForm() {
                       />
                     </FormControl>
                     <FormMessage>
-                      {form.formState.errors.email?.message ||
-                        state?.errors?.email}
+                      {error?.email &&
+                        error.email.map((error) => <p key={error}>{error}</p>)}
                     </FormMessage>
                   </FormItem>
                 )}
@@ -122,8 +97,10 @@ export default function SignupForm() {
                       />
                     </FormControl>
                     <FormMessage>
-                      {form.formState.errors.password?.message ||
-                        state?.errors?.password}
+                      {error?.password &&
+                        error.password.map((error) => (
+                          <p key={error}>{error}</p>
+                        ))}
                     </FormMessage>
                   </FormItem>
                 )}
@@ -143,8 +120,10 @@ export default function SignupForm() {
                       />
                     </FormControl>
                     <FormMessage>
-                      {form.formState.errors.confirmPassword?.message ||
-                        state?.errors?.confirmPassword}
+                      {error?.confirmPassword &&
+                        error.confirmPassword.map((error) => (
+                          <p key={error}>{error}</p>
+                        ))}
                     </FormMessage>
                   </FormItem>
                 )}

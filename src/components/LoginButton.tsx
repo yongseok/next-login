@@ -10,12 +10,13 @@ export default function LoginButton({
   isLoading,
   onClick,
   session,
+  ...props
 }: {
   provider: 'google' | 'github' | 'credentials';
   isLoading: boolean;
   onClick: () => void;
   session: Session | null;
-}) {
+} & React.ComponentProps<'button'>) {
   return (
     <Button
       type='button'
@@ -23,6 +24,7 @@ export default function LoginButton({
       disabled={isLoading}
       className='w-full flex items-center justify-center gap-2'
       onClick={onClick}
+      {...props}
     >
       {isLoading ? (
         <Loader2 className='w-5 h-5 animate-spin' />
