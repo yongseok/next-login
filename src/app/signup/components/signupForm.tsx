@@ -12,37 +12,11 @@ import {
 } from '@/components/ui/form';
 import { UserPlus } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
-import { useEffect } from 'react';
-import { toast } from 'sonner';
 import { signIn } from 'next-auth/react';
 import useSignup from '@/lib/hooks/useSignup';
 
 export default function SignupForm() {
   const { isLoading, error, form, signup } = useSignup();
-  console.log('🚀 | SignupForm | error:', error);
-
-  // 폼 제출 후 상태 처리
-  // useEffect(() => {
-  //   if (state?.success === false && state?.message) {
-  //     toast.error(state.message);
-
-  //     if (
-  //       state.message.includes('이미 존재하는 이메일입니다.') ||
-  //       state.message.includes('사용자를 찾을 수 없습니다.')
-  //     ) {
-  //       form.setFocus('email');
-  //       form.setError('email', { message: state.message });
-  //     }
-  //   } else if (state?.success === true && state?.message) {
-  //     toast.success(state.message);
-  //     signIn('credentials', {
-  //       email: form.getValues('email'),
-  //       password: form.getValues('password'),
-  //       redirect: true,
-  //       redirectTo: '/',
-  //     });
-  //   }
-  // }, [state, form]);
 
   return (
     <div className='min-h-screen flex items-center justify-center'>
@@ -73,6 +47,7 @@ export default function SignupForm() {
                         {...field}
                         placeholder='이메일을 입력하세요'
                         className='bg-gray-50'
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage>
@@ -94,6 +69,7 @@ export default function SignupForm() {
                         type='password'
                         placeholder='비밀번호를 입력하세요'
                         className='bg-gray-50'
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage>
@@ -117,6 +93,7 @@ export default function SignupForm() {
                         type='password'
                         placeholder='비밀번호를 다시 입력하세요'
                         className='bg-gray-50'
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage>
@@ -128,7 +105,7 @@ export default function SignupForm() {
                   </FormItem>
                 )}
               />
-              <Button type='submit' className='w-full'>
+              <Button type='submit' className='w-full' disabled={isLoading}>
                 회원가입
               </Button>
             </form>
@@ -147,6 +124,7 @@ export default function SignupForm() {
                 redirectTo: '/',
               });
             }}
+            disabled={isLoading}
           >
             <FcGoogle className='w-5 h-5' />
             <span className='font-medium'>Google로 회원가입</span>
