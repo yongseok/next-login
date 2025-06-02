@@ -35,16 +35,13 @@ export default function AuthFields<T extends FieldValues>({
                 className='bg-gray-50'
               />
             </FormControl>
-            <FormMessage />
-            {errors?.email ? (
-              <p className='text-sm font-medium text-destructive'>
-                {errors.email}
-              </p>
-            ) : form.formState.errors.email?.message ? (
-              <p className='text-sm font-medium text-destructive'>
-                {form.formState.errors.email?.message.toString()}
-              </p>
-            ) : null}
+            <FormMessage>
+              {errors?.email && (
+                <p className='text-sm font-medium text-destructive'>
+                  {errors.email}
+                </p>
+              )}
+            </FormMessage>
           </FormItem>
         )}
       />
@@ -62,16 +59,13 @@ export default function AuthFields<T extends FieldValues>({
                 className='bg-gray-50'
               />
             </FormControl>
-            <FormMessage />
-            {errors?.password ? (
-              <p className='text-sm font-medium text-destructive'>
-                {errors.password}
-              </p>
-            ) : form.formState.errors.password?.message ? (
-              <p className='text-sm font-medium text-destructive'>
-                {form.formState.errors.password?.message.toString()}
-              </p>
-            ) : null}
+            <FormMessage>
+              {errors?.password && (
+                <p className='text-sm font-medium text-destructive'>
+                  {errors.password}
+                </p>
+              )}
+            </FormMessage>
           </FormItem>
         )}
       />

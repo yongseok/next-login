@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { signinAction } from '@/app/actions/auth';
 import { LoginFormErrors } from '@/lib/validations/loginSchema';
+import { useRouter } from 'next/navigation';
 
 type Provider = 'google' | 'github';
 
@@ -18,17 +18,19 @@ interface UseLoginReturn {
 /**
  * 사용 예시:
  * ```tsx
- * const { isLoading, loginWithOAuth, loginWithCredentials, error } = useLogin();
+ * 'use client';
  *
- * <LoginForm
- *  isLoading={isLoading}
- *  loginWithOAuth={loginWithOAuth}
- *  loginWithCredentials={loginWithCredentials}
- *  error={error}
- * />
+ * import { useLogin } from '@/lib/hooks/useLogin';
+ *
+ * export default function LoginForm() {
+ *   const { isLoading, loginWithOAuth, loginWithCredentials, error } = useLogin();
+ *
+ *   // ...폼 UI 및 로직
+ * }
  * ```
  */
 export const useLogin = (): UseLoginReturn => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [currentProvider, setCurrentProvider] = useState<Provider | null>(null);
   const [error, setError] = useState<LoginFormErrors | null>(null);
@@ -61,28 +63,31 @@ export const useLogin = (): UseLoginReturn => {
     setError(null);
     setIsLoading(true);
     try {
-      const result = await signinAction(
-        {
-          success: false,
-          message: '',
-          errors: {},
-        },
-        formData
-      );
-
-      if (result.success) {
-        window.location.href = '/';
-      } else {
-        if (result.errors) {
-          setError(result.errors);
-        } else {
+      const result = await signIn('credentials', {
+        email: formData.get('email'),
+        password: formData.get('password'),
+        redirect: false,
+        redirectTo: '/profile',
+      });
+      if (result?.error) {
+        if (result.error.includes('CredentialsSignin')) {
           setError({
-            CredentialsError: result.message,
+            CredentialsError: '이메일 또는 비밀번호가 일치하지 않습니다.',
           });
+        } else {
+          setError({ CredentialsError: result.error });
         }
       }
+      if (result?.ok) {
+        router.push('/profile');
+      }
     } catch (error) {
-      console.error('🚨 Form submission error:', error);
+      console.error('Login error:', error);
+      if (error instanceof Error) {
+        setError({ CredentialsError: error.message });
+      } else {
+        setError({ CredentialsError: '로그인 실패' });
+      }
     } finally {
       setIsLoading(false);
     }

@@ -43,7 +43,25 @@ export function createActionErrorResponse<Errors = unknown>(
     };
   }
 
-  if (error instanceof PrismaClientKnownRequestError) {
+  if (
+    error instanceof PrismaClientKnownRequestError ||
+    error.name === 'PrismaClientKnownRequestError'
+  ) {
+    if (error.code === 'P2002') {
+      return {
+        success: false,
+        message: '이미 존재하는 이메일입니다.',
+        details: error.meta,
+      };
+    }
+
+    if (error.code === 'P2025') {
+      return {
+        success: false,
+        message: '사용자를 찾을 수 없습니다.',
+        details: error.meta,
+      };
+    }
     return {
       success: false,
       message: error.message,

@@ -3,8 +3,11 @@
 import { AppError } from './errors';
 
 export class UserNotFoundError extends AppError {
-  constructor(message: string = '사용자를 찾을 수 없습니다.') {
-    super(message, 'USER_NOT_FOUND', undefined, 404);
+  constructor(
+    message: string = '사용자를 찾을 수 없습니다.',
+    public readonly details?: unknown
+  ) {
+    super(message, 'USER_NOT_FOUND', details, 404);
   }
 }
 

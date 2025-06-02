@@ -5,6 +5,7 @@ import { userService } from './lib/services/user.service';
 import Credentials from 'next-auth/providers/credentials';
 import { loginSchema } from './lib/validations/loginSchema';
 import { Role } from '@prisma/client';
+import { AppError } from './lib/errors/errors';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   debug: true,
@@ -19,8 +20,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: { label: 'Password', type: 'password' },
       },
       authorize: async (credentials) => {
-        const { email, password } = await loginSchema.parseAsync(credentials);
-        return await userService.login({ email, password });
+        try {
+          const { email, password } = await loginSchema.parseAsync(credentials);
+          const user = await userService.login({ email, password });
+          return user;
+        } catch (error) {
+          if (error instanceof AppError) {
+            console.error(
+              '🚀 | authorize | error:',
+              error.message,
+              error.details ? JSON.stringify(error.details) : 'no details'
+            );
+          } else {
+            console.error('🚀 | authorize | error:', error);
+          }
+          return null;
+        }
       },
     }),
     GoogleProvider({

@@ -31,7 +31,9 @@ class UserService {
   async login(user: { email: string; password: string }): Promise<User> {
     const findUser = await this.userRepo.getUserByEmail(user.email);
     if (!findUser) {
-      throw new UserNotFoundError();
+      throw new UserNotFoundError('사용자를 찾을 수 없습니다.', {
+        email: user.email,
+      });
     }
 
     if (!findUser.password) {

@@ -1,22 +1,19 @@
 import LoginForm from '@/app/login/components/LoginForm';
-import { useLogin } from '@/lib/hooks/useLogin';
-import { useSession } from 'next-auth/react';
 
-export default function SignInPage() {
-  const { data: session } = useSession();
-  const {
-    isLoading,
-    loginWithOAuth,
-    loginWithCredentials,
-    error,
-  } = useLogin();
-  return (
-    <LoginForm
-      isLoading={isLoading}
-      loginWithOAuth={loginWithOAuth}
-      loginWithCredentials={loginWithCredentials}
-      error={error}
-      session={session}
-    />
-  );
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const { error, code } = await searchParams;
+
+  if (error) {
+    return (
+      <div>
+        Error: {error}, code: {code}
+      </div>
+    );
+  }
+
+  return <LoginForm />;
 }

@@ -13,24 +13,13 @@ import {
   loginSchema,
 } from '@/lib/validations/loginSchema';
 import { Form } from '../../../components/ui/form';
-import { LoginFormErrors } from '@/lib/validations/loginSchema';
-import { Session } from 'next-auth';
+import { useSession } from 'next-auth/react';
+import { useLogin } from '@/lib/hooks/useLogin';
 
-interface LoginFormProps {
-  isLoading: boolean;
-  loginWithOAuth: (provider: 'google' | 'github') => Promise<void>;
-  loginWithCredentials: (formData: FormData) => Promise<void>;
-  error: LoginFormErrors | null;
-  session: Session | null;
-}
+export default function LoginForm() {
+  const { data: session } = useSession();
+  const { isLoading, loginWithOAuth, loginWithCredentials, error } = useLogin();
 
-export default function LoginForm({
-  isLoading,
-  loginWithOAuth,
-  loginWithCredentials,
-  error,
-  session,
-}: LoginFormProps) {
   const form = useForm<UserLoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -38,6 +27,13 @@ export default function LoginForm({
       password: '',
     },
   });
+
+  const onSubmit = async (data: UserLoginForm) => {
+    const formData = new FormData();
+    formData.append('email', data.email);
+    formData.append('password', data.password);
+    await loginWithCredentials(formData);
+  };
 
   return (
     <div className='min-h-screen flex items-center justify-center'>
@@ -51,7 +47,7 @@ export default function LoginForm({
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form action={loginWithCredentials} className='space-y-4'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
               <AuthFields form={form} errors={error} />
               {error?.CredentialsError && (
                 <p className='text-red-500 text-sm'>{error.CredentialsError}</p>

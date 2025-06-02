@@ -44,10 +44,24 @@ export default function Register() {
   useEffect(() => {
     if (state?.success === false && state?.message) {
       toast.error(state.message);
+
+      if (
+        state.message.includes('이미 존재하는 이메일입니다.') ||
+        state.message.includes('사용자를 찾을 수 없습니다.')
+      ) {
+        form.setFocus('email');
+        form.setError('email', { message: state.message });
+      }
     } else if (state?.success === true && state?.message) {
       toast.success(state.message);
+      signIn('credentials', {
+        email: form.getValues('email'),
+        password: form.getValues('password'),
+        redirect: true,
+        redirectTo: '/',
+      });
     }
-  }, [state]);
+  }, [state, form]);
   console.log('🚀 | Register | state:', state);
 
   // 폼 제출 핸들러
