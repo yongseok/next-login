@@ -1,19 +1,12 @@
 'use client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form';
+import { Form } from '@/components/ui/form';
 import { UserPlus } from 'lucide-react';
 import { FcGoogle } from 'react-icons/fc';
 import { signIn } from 'next-auth/react';
 import useSignup from '@/lib/hooks/useSignup';
+import AuthFields from '@/components/AuthFields';
 
 export default function SignupForm() {
   const { isLoading, error, form, signup } = useSignup();
@@ -36,74 +29,17 @@ export default function SignupForm() {
               })}
               className='space-y-4'
             >
-              <FormField
-                control={form.control}
-                name='email'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder='이메일을 입력하세요'
-                        className='bg-gray-50'
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormMessage>
-                      {error?.email &&
-                        error.email.map((error) => <p key={error}>{error}</p>)}
-                    </FormMessage>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='password'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type='password'
-                        placeholder='비밀번호를 입력하세요'
-                        className='bg-gray-50'
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormMessage>
-                      {error?.password &&
-                        error.password.map((error) => (
-                          <p key={error}>{error}</p>
-                        ))}
-                    </FormMessage>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='confirmPassword'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type='password'
-                        placeholder='비밀번호를 다시 입력하세요'
-                        className='bg-gray-50'
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormMessage>
-                      {error?.confirmPassword &&
-                        error.confirmPassword.map((error) => (
-                          <p key={error}>{error}</p>
-                        ))}
-                    </FormMessage>
-                  </FormItem>
-                )}
+              <AuthFields
+                form={form}
+                errors={error}
+                extraFields={[
+                  {
+                    name: 'confirmPassword',
+                    label: 'Confirm Password',
+                    placeholder: '비밀번호를 다시 입력하세요',
+                    type: 'password',
+                  },
+                ]}
               />
               <Button type='submit' className='w-full' disabled={isLoading}>
                 회원가입

@@ -9,16 +9,23 @@ import {
   FormMessage,
 } from './ui/form';
 import { Input } from './ui/input';
-import { LoginFormErrors } from '@/lib/validations/loginSchema';
+import { AuthFormErrors } from '@/lib/validations/loginSchema';
 
 interface AuthFieldsProps<T extends FieldValues> {
   form: UseFormReturn<T>;
-  errors?: LoginFormErrors | null;
+  errors?: AuthFormErrors | null;
+  extraFields?: {
+    name: Path<T>;
+    label: string;
+    placeholder: string;
+    type: string;
+  }[];
 }
 
 export default function AuthFields<T extends FieldValues>({
   form,
   errors,
+  extraFields,
 }: AuthFieldsProps<T>) {
   return (
     <>
@@ -69,6 +76,28 @@ export default function AuthFields<T extends FieldValues>({
           </FormItem>
         )}
       />
+      {extraFields?.map((f) => (
+        <FormField
+          key={f.name}
+          control={form.control}
+          name={f.name as Path<T>}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{f.label}</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder={f.placeholder} type={f.type} />
+              </FormControl>
+              <FormMessage>
+                {errors?.[f.name as Path<T>] && (
+                  <p className='text-sm font-medium text-destructive'>
+                    {errors[f.name as Path<T>]}
+                  </p>
+                )}
+              </FormMessage>
+            </FormItem>
+          )}
+        />
+      ))}
     </>
   );
 }

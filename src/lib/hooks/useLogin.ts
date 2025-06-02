@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { LoginFormErrors } from '@/lib/validations/loginSchema';
+import { AuthFormErrors } from '@/lib/validations/loginSchema';
 import { useRouter } from 'next/navigation';
 
 type Provider = 'google' | 'github';
@@ -10,7 +10,7 @@ type Provider = 'google' | 'github';
 interface UseLoginReturn {
   isLoading: boolean;
   currentProvider: Provider | null;
-  error: LoginFormErrors | null;
+  error: AuthFormErrors | null;
   loginWithOAuth: (provider: Provider) => Promise<void>;
   loginWithCredentials: (formData: FormData) => Promise<void>;
 }
@@ -33,7 +33,7 @@ export const useLogin = (): UseLoginReturn => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [currentProvider, setCurrentProvider] = useState<Provider | null>(null);
-  const [error, setError] = useState<LoginFormErrors | null>(null);
+  const [error, setError] = useState<AuthFormErrors | null>(null);
 
   // OAuth 로그인 처리
   const loginWithOAuth = async (provider: Provider) => {
@@ -77,8 +77,7 @@ export const useLogin = (): UseLoginReturn => {
         } else {
           setError({ CredentialsError: result.error });
         }
-      }
-      if (result?.ok) {
+      } else {
         router.push('/profile');
       }
     } catch (error) {
