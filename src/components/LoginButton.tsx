@@ -14,7 +14,7 @@ export default function LoginButton({
 }: {
   provider: 'google' | 'github' | 'credentials';
   isLoading: boolean;
-  onClick: () => void;
+  onClick?: () => void;
   session: Session | null;
 } & React.ComponentProps<'button'>) {
   return (

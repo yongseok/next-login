@@ -64,6 +64,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     // 로그인 시 사용자 정보 생성
     // 호출 시점: 로그인 시 호출
     async signIn({ user }) {
+      console.log('🚀 | signIn | user:', user);
       try {
         if (user.email) {
           const findUser = await userService.getUserByEmail(user.email);

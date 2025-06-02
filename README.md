@@ -76,7 +76,7 @@
 
 **2025.06.02**
 
-- [ ] 폼 필드 공통화
+- [x] 폼 필드 공통화
   - AuthFields를 확장하여 confirmPassword 등 추가 필드를 prop으로 받아 처리.
 - [ ] OAuth 버튼 공통화
   - Signup에서도 LoginButton(OAuthButton) 컴포넌트 사용.

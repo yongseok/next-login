@@ -35,7 +35,7 @@ export default function LoginForm() {
   return (
     <>
       <Form {...form}>
-        <form className='space-y-4'>
+        <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
           <AuthFields form={form} errors={error} />
           {error?.CredentialsError && (
             <p className='text-red-500 text-sm'>{error.CredentialsError}</p>
@@ -43,9 +43,9 @@ export default function LoginForm() {
           <LoginButton
             provider='credentials'
             isLoading={isLoading}
-            onClick={form.handleSubmit(onSubmit)}
             session={session}
             className='w-full'
+            type='submit'
           />
         </form>
       </Form>
