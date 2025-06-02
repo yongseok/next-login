@@ -80,11 +80,11 @@
   - AuthFields를 확장하여 confirmPassword 등 추가 필드를 prop으로 받아 처리.
 - [ ] OAuth 버튼 공통화
   - Signup에서도 LoginButton(OAuthButton) 컴포넌트 사용.
-- [ ] 커스텀 훅 분리
+- [X] 커스텀 훅 분리
   - useSignup 훅을 만들어 상태, 제출, 에러 핸들링 분리.
-- [ ] 액션/훅 네이밍 및 사용 패턴 통일
+- [X] 액션/훅 네이밍 및 사용 패턴 통일
   - 예: useLogin, useSignup 등으로 통일.
-- [ ] UI/로직 구조 통일
+- [X] UI/로직 구조 통일
   - Signup, Login 모두 "공통 컴포넌트 + 커스텀 훅" 패턴으로 통일.
 
 **추가 작업**  
