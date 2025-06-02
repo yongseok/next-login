@@ -38,8 +38,10 @@ import { useEffect } from 'react';
 import { Role } from '@prisma/client';
 import { useUpdateUser } from '@/lib/swr/useUsers';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export function UserSheet() {
+  const router = useRouter();
   const { data: session } = useSession();
   const { userUpdateTrigger, userUpdateIsMutating, userUpdateError } =
     useUpdateUser(session?.user?.email ?? '');
@@ -73,6 +75,7 @@ export function UserSheet() {
   const onSubmit = async (data: UserUpdateDto) => {
     try {
       userUpdateTrigger(data);
+      router.refresh(); // 서버 컴포넌트 새로고침
     } catch (error) {
       console.error('🚀 | onSubmit | error:', error);
     }
@@ -88,7 +91,9 @@ export function UserSheet() {
           <SheetHeader>
             <SheetTitle>사용자 정보</SheetTitle>
             <SheetDescription>
-              {session ? '사용자 정보를 수정할 수 있습니다.' : '로그인 후 사용할 수 있습니다.'}
+              {session
+                ? '사용자 정보를 수정할 수 있습니다.'
+                : '로그인 후 사용할 수 있습니다.'}
             </SheetDescription>
           </SheetHeader>
           {session ? (
