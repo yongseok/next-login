@@ -1,15 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import LoginButton from '../../../components/LoginButton';
-import AuthFields from '../../../components/AuthFields';
+import LoginButton from '@/components/LoginButton';
+import AuthFields from '@/components/AuthFields';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   LoginForm as UserLoginForm,
   loginSchema,
 } from '@/lib/validations/loginSchema';
-import { Form } from '../../../components/ui/form';
+import { Form } from '@/components/ui/form';
 import { useSession } from 'next-auth/react';
 import { useLogin } from '@/lib/hooks/useLogin';
 

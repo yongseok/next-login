@@ -7,8 +7,10 @@ import { FcGoogle } from 'react-icons/fc';
 import { signIn } from 'next-auth/react';
 import useSignup from '@/lib/hooks/useSignup';
 import AuthFields from '@/components/AuthFields';
+import { useTranslations } from 'next-intl';
 
 export default function SignupForm() {
+  const t = useTranslations('signup');
   const { isLoading, error, form, signup } = useSignup();
 
   return (
@@ -18,8 +20,8 @@ export default function SignupForm() {
           <div className='bg-primary rounded-full p-3'>
             <UserPlus className='w-8 h-8 text-primary-foreground' />
           </div>
-          <CardTitle className='text-2xl font-bold'>회원가입</CardTitle>
-          <p className='text-gray-500 text-sm'>새 계정을 만들어보세요</p>
+          <CardTitle className='text-2xl font-bold'>{t('title')}</CardTitle>
+          <p className='text-gray-500 text-sm'>{t('subtitle')}</p>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -35,20 +37,20 @@ export default function SignupForm() {
                 extraFields={[
                   {
                     name: 'confirmPassword',
-                    label: 'Confirm Password',
-                    placeholder: '비밀번호를 다시 입력하세요',
+                    label: t('confirmPassword'),
+                    placeholder: t('confirmPassword'),
                     type: 'password',
                   },
                 ]}
               />
               <Button type='submit' className='w-full' disabled={isLoading}>
-                회원가입
+                {t('submit')}
               </Button>
             </form>
           </Form>
           <div className='my-4 flex items-center'>
             <div className='flex-grow h-px bg-gray-200' />
-            <span className='mx-2 text-gray-400 text-xs'>또는</span>
+            <span className='mx-2 text-gray-400 text-xs'>{t('or')}</span>
             <div className='flex-grow h-px bg-gray-200' />
           </div>
           <Button
@@ -63,7 +65,7 @@ export default function SignupForm() {
             disabled={isLoading}
           >
             <FcGoogle className='w-5 h-5' />
-            <span className='font-medium'>Google로 회원가입</span>
+            <span className='font-medium'>{t('googleSignup')}</span>
           </Button>
         </CardContent>
       </Card>

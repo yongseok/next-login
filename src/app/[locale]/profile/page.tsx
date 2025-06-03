@@ -1,6 +1,6 @@
 import { auth } from '@/auth';
 import { userService } from '@/lib/services/user.service';
-import Profile from '@/app/profile/components/Profile';
+import Profile from '@/app/[locale]/profile/components/Profile';
 
 export default async function ProfilePage() {
   const session = await auth();

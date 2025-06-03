@@ -10,6 +10,7 @@ import {
 } from './ui/form';
 import { Input } from './ui/input';
 import { AuthFormErrors } from '@/lib/validations/loginSchema';
+import { useTranslations } from 'next-intl';
 
 interface AuthFieldsProps<T extends FieldValues> {
   form: UseFormReturn<T>;
@@ -27,6 +28,7 @@ export default function AuthFields<T extends FieldValues>({
   errors,
   extraFields,
 }: AuthFieldsProps<T>) {
+  const t = useTranslations('signup');
   return (
     <>
       <FormField
@@ -34,11 +36,11 @@ export default function AuthFields<T extends FieldValues>({
         name={'email' as Path<T>}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Email</FormLabel>
+            <FormLabel>{t('email')}</FormLabel>
             <FormControl>
               <Input
                 {...field}
-                placeholder='이메일을 입력하세요'
+                placeholder={t('emailPlaceholder')}
                 className='bg-gray-50'
               />
             </FormControl>
@@ -57,12 +59,12 @@ export default function AuthFields<T extends FieldValues>({
         name={'password' as Path<T>}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Password</FormLabel>
+            <FormLabel>{t('password')}</FormLabel>
             <FormControl>
               <Input
                 {...field}
                 type='password'
-                placeholder='비밀번호를 입력하세요'
+                placeholder={t('passwordPlaceholder')}
                 className='bg-gray-50'
               />
             </FormControl>

@@ -1,0 +1,20 @@
+{
+  "signup": {
+    "title": "Sign Up",
+    "subtitle": "Create a new account",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "submit": "Sign Up",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "googleSignup": "Sign up with Google",
+    "or": "Or"
+  },
+  "logout": {
+    "title": "Log Out",
+    "description": "Are you sure you want to log out?",
+    "subDescription": "If you log out, you will be redirected to the main page.",
+    "logout": "Logout"
+  }
+}
