@@ -63,6 +63,12 @@
       "passwordSpecialCharacter": "Password must contain a special character.",
       "passwordMatch": "Password does not match."
     },
+    "userSheet": {
+      "email": "Email format is not valid.",
+      "nameMinLength": "Name must be at least 2 characters long.",
+      "passwordMinLength": "Password must be at least 8 characters long.",
+      "passwordSpecialCharacter": "Password must contain a special character."
+    },
     "invalid_string": {
       "min": "Must be at least {{min}} characters long."
     }

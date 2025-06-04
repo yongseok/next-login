@@ -63,6 +63,12 @@
       "passwordSpecialCharacter": "비밀번호에는 특수문자가 포함되어야 합니다.",
       "passwordMatch": "비밀번호가 일치하지 않습니다."
     },
+    "userSheet": {
+      "email": "이메일 형식이 올바르지 않습니다.",
+      "nameMinLength": "이름은 최소 2자 이상이어야 합니다.",
+      "passwordMinLength": "비밀번호는 최소 8자 이상이어야 합니다.",
+      "passwordSpecialCharacter": "비밀번호에는 특수문자가 포함되어야 합니다."
+    },
     "invalid_string": {
       "min": "최소 {{min}}자 이상이어야 합니다."
     }

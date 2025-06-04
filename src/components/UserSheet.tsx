@@ -49,7 +49,7 @@ export function UserSheet() {
     useUpdateUser(session?.user?.email ?? '');
 
   const form = useForm<UserUpdateDto>({
-    resolver: zodResolver(userUpdateSchema),
+    resolver: zodResolver(userUpdateSchema(useTranslations('zod.userSheet'))),
     defaultValues: {
       name: session?.user?.name ?? '',
       email: session?.user?.email ?? '',
