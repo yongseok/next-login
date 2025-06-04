@@ -8,12 +8,14 @@ import {
 import { userService } from '@/lib/services/user.service';
 import { withActionErrorHandler } from '@/lib/errors/actionHandlers';
 import { Role } from '@prisma/client';
+import { useTranslations } from 'next-intl';
 
 export const signupAction = withActionErrorHandler<SignupFormErrors>(
+
   async (_state: SignupFormState, formData: FormData) => {
     // 유효성 검사
     try {
-      const validatedFields = signupSchema.parse({
+      const validatedFields = signupSchema(useTranslations('zod.signup')).parse({
         email: formData.get('email'),
         password: formData.get('password'),
         confirmPassword: formData.get('confirmPassword'),

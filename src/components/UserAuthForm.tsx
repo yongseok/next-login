@@ -7,11 +7,13 @@ import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Icons } from './icons';
+import { useTranslations } from 'next-intl';
 
 export function UserAuthForm({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
+  const t = useTranslations('login');
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   async function onSubmit(event: React.SyntheticEvent) {
@@ -29,7 +31,7 @@ export function UserAuthForm({
         <div className='grid gap-2'>
           <div className='grid gap-1'>
             <Label className='sr-only' htmlFor='email'>
-              Email
+              {t('email')}
             </Label>
             <Input
               id='email'
@@ -45,7 +47,7 @@ export function UserAuthForm({
             {isLoading && (
               <Icons.spinner className='mr-2 h-4 w-4 animate-spin' />
             )}
-            Sign In with Email
+            {t('credentialsLogin')}
           </Button>
         </div>
       </form>
@@ -55,7 +57,7 @@ export function UserAuthForm({
         </div>
         <div className='relative flex justify-center text-xs uppercase'>
           <span className='bg-background px-2 text-muted-foreground'>
-            Or continue with
+            {t('or')}
           </span>
         </div>
       </div>
@@ -65,7 +67,7 @@ export function UserAuthForm({
         ) : (
           <Icons.gitHub className='mr-2 h-4 w-4' />
         )}{' '}
-        GitHub
+        {t('githubLogin')}
       </Button>
     </div>
   );

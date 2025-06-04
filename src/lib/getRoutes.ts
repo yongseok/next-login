@@ -1,16 +1,16 @@
 import { Home, Info } from 'lucide-react';
 
-export const getRoutes = (pathname: string) => {
+export const getRoutes = (pathname: string, t: (key: string) => string) => {
   const routes = [
     {
       href: '/',
-      label: 'Home',
+      label: t('home'),
       icon: Home,
       active: pathname === '/',
     },
     {
       href: '/about',
-      label: 'About',
+      label: t('about'),
       icon: Info,
       active: pathname === '/about',
     },

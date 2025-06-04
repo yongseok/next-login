@@ -12,13 +12,15 @@ import {
 import { Form } from '@/components/ui/form';
 import { useSession } from 'next-auth/react';
 import { useLogin } from '@/lib/hooks/useLogin';
+import { useTranslations } from 'next-intl';
 
 export default function LoginForm() {
+  const t = useTranslations('login');
   const { data: session } = useSession();
   const { isLoading, loginWithOAuth, loginWithCredentials, error } = useLogin();
 
   const form = useForm<UserLoginForm>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(loginSchema(useTranslations('zod.login'))),
     defaultValues: {
       email: '',
       password: '',
@@ -51,7 +53,7 @@ export default function LoginForm() {
       </Form>
       <div className='my-4 flex items-center'>
         <div className='flex-grow h-px bg-gray-200' />
-        <span className='mx-2 text-gray-400 text-xs'>또는</span>
+        <span className='mx-2 text-gray-400 text-xs'>{t('or')}</span>
         <div className='flex-grow h-px bg-gray-200' />
       </div>
       <div className='flex flex-col gap-2'>
@@ -72,12 +74,12 @@ export default function LoginForm() {
         )}
       </div>
       <div className='flex justify-between items-center mt-2'>
-        <span className='text-sm text-gray-500'>계정이 없으신가요?</span>
+        <span className='text-sm text-gray-500'>{t('noAccount')}</span>
         <Link
           href='/signup'
           className='text-sm text-primary underline underline-offset-2'
         >
-          회원가입
+          {t('signup')}
         </Link>
       </div>
     </>

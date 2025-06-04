@@ -1,4 +1,8 @@
 {
+  "LocaleSwitcher": {
+    "label": "언어 선택",
+    "locale": "{locale, select, ko {🇰🇷 한국어} en {🇺🇸 영어} other {Unknown}}"
+  },
   "signup": {
     "title": "회원가입",
     "subtitle": "새 계정을 만들어보세요",
@@ -16,5 +20,51 @@
     "description": "정말 로그아웃 하시겠습니까?",
     "subDescription": "로그아웃하면 메인 페이지로 이동합니다.",
     "logout": "로그아웃"
+  },
+  "login": {
+    "title": "로그인",
+    "description": "계정에 로그인하세요",
+    "noAccount": "계정이 없으신가요?",
+    "signup": "회원가입",
+    "login": "로그인",
+    "logout": "로그아웃",
+    "withLogin": "{provider}로 {login}",
+    "or": "또는",
+    "email": "이메일",
+    "password": "비밀번호"
+  },
+  "userSheet": {
+    "title": "사용자 정보",
+    "description": "사용자 정보를 수정할 수 있습니다.",
+    "noAccount": "로그인 후 사용할 수 있습니다.",
+    "email": "이메일",
+    "name": "이름",
+    "role": "역할",
+    "submit": "저장",
+    "roleDescription": "사용자 권한을 수정할 수 있습니다.",
+    "login": "로그인",
+    "Admin": "관리자",
+    "User": "사용자"
+  },
+  "mainNavigation": {
+    "home": "홈",
+    "about": "소개"
+  },
+  "zod": {
+    "login": {
+      "email": "이메일 형식이 올바르지 않습니다.",
+      "passwordMinLength": "비밀번호는 최소 8자 이상이어야 합니다.",
+      "passwordSpecialCharacter": "비밀번호에는 특수문자가 포함되어야 합니다."
+    },
+    "signup": {
+      "email": "이메일 형식이 올바르지 않습니다.",
+      "nameMinLength": "이름은 최소 2자 이상이어야 합니다.",
+      "passwordMinLength": "비밀번호는 최소 8자 이상이어야 합니다.",
+      "passwordSpecialCharacter": "비밀번호에는 특수문자가 포함되어야 합니다.",
+      "passwordMatch": "비밀번호가 일치하지 않습니다."
+    },
+    "invalid_string": {
+      "min": "최소 {{min}}자 이상이어야 합니다."
+    }
   }
 }

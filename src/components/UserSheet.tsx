@@ -39,8 +39,10 @@ import { Role } from '@prisma/client';
 import { useUpdateUser } from '@/lib/swr/useUsers';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 export function UserSheet() {
+  const t = useTranslations('userSheet');
   const router = useRouter();
   const { data: session } = useSession();
   const { userUpdateTrigger, userUpdateIsMutating, userUpdateError } =
@@ -89,11 +91,9 @@ export function UserSheet() {
         </SheetTrigger>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>사용자 정보</SheetTitle>
+            <SheetTitle>{t('title')}</SheetTitle>
             <SheetDescription>
-              {session
-                ? '사용자 정보를 수정할 수 있습니다.'
-                : '로그인 후 사용할 수 있습니다.'}
+              {session ? t('description') : t('noAccount')}
             </SheetDescription>
           </SheetHeader>
           {session ? (
@@ -107,7 +107,7 @@ export function UserSheet() {
                   name='email'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel>{t('email')}</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -125,7 +125,7 @@ export function UserSheet() {
                   name='name'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>{t('name')}</FormLabel>
                       <FormControl>
                         <Input {...field} />
                       </FormControl>
@@ -138,7 +138,7 @@ export function UserSheet() {
                   name='role'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Role</FormLabel>
+                      <FormLabel>{t('role')}</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -149,13 +149,13 @@ export function UserSheet() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value={Role.ADMIN}>Admin</SelectItem>
-                          <SelectItem value={Role.USER}>User</SelectItem>
+                          <SelectItem value={Role.ADMIN}>
+                            {t('Admin')}
+                          </SelectItem>
+                          <SelectItem value={Role.USER}>{t('User')}</SelectItem>
                         </SelectContent>
                       </Select>
-                      <FormDescription>
-                        사용자 권한을 수정할 수 있습니다.
-                      </FormDescription>
+                      <FormDescription>{t('roleDescription')}</FormDescription>
                       <FormMessage>{errors.role?.message}</FormMessage>
                     </FormItem>
                   )}
@@ -169,7 +169,7 @@ export function UserSheet() {
                     {userUpdateIsMutating ? (
                       <Loader2 className='mr-2 h-4 w-4 animate-spin' />
                     ) : (
-                      '저장'
+                      t('submit')
                     )}
                   </Button>
                 </SheetClose>
@@ -180,10 +180,10 @@ export function UserSheet() {
             </Form>
           ) : (
             <div className='flex flex-col items-center justify-center h-full gap-4'>
-              <p>로그인 후 사용할 수 있습니다.</p>
+              <p>{t('noAccount')}</p>
               <SheetClose asChild>
                 <Button asChild>
-                  <Link href='/api/auth/signin'>로그인</Link>
+                  <Link href='/api/auth/signin'>{t('login')}</Link>
                 </Button>
               </SheetClose>
             </div>

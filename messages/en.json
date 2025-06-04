@@ -1,4 +1,8 @@
 {
+  "LocaleSwitcher": {
+    "label": "Change language",
+    "locale": "{locale, select, ko {🇰🇷 Korean} en {🇺🇸 English} other {Unknown}}"
+  },
   "signup": {
     "title": "Sign Up",
     "subtitle": "Create a new account",
@@ -16,5 +20,51 @@
     "description": "Are you sure you want to log out?",
     "subDescription": "If you log out, you will be redirected to the main page.",
     "logout": "Logout"
+  },
+  "login": {
+    "title": "Login",
+    "description": "Login to your account",
+    "noAccount": "Don't have an account?",
+    "signup": "Sign Up",
+    "login": "Login",
+    "logout": "Log Out",
+    "withLogin": "{login} with {provider}",
+    "or": "Or continue with",
+    "email": "Email",
+    "password": "password"
+  },
+  "userSheet": {
+    "title": "User Information",
+    "description": "You can edit your user information.",
+    "noAccount": "Login to edit your information.",
+    "email": "Email",
+    "name": "Name",
+    "role": "Role",
+    "submit": "Save",
+    "roleDescription": "You can edit your user role.",
+    "login": "Login",
+    "Admin": "Admin",
+    "User": "User"
+  },
+  "mainNavigation": {
+    "home": "Home",
+    "about": "About"
+  },
+  "zod": {
+    "login": {
+      "email": "Email format is not valid.",
+      "passwordMinLength": "Password must be at least 8 characters long.",
+      "passwordSpecialCharacter": "Password must contain a special character."
+    },
+    "signup": {
+      "email": "Email format is not valid.",
+      "nameMinLength": "Name must be at least 2 characters long.",
+      "passwordMinLength": "Password must be at least 8 characters long.",
+      "passwordSpecialCharacter": "Password must contain a special character.",
+      "passwordMatch": "Password does not match."
+    },
+    "invalid_string": {
+      "min": "Must be at least {{min}} characters long."
+    }
   }
 }

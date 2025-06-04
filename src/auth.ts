@@ -6,6 +6,7 @@ import Credentials from 'next-auth/providers/credentials';
 import { loginSchema } from './lib/validations/loginSchema';
 import { Role } from '@prisma/client';
 import { AppError } from './lib/errors/errors';
+import { getTranslations } from 'next-intl/server';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   debug: true,
@@ -21,7 +22,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       authorize: async (credentials) => {
         try {
-          const { email, password } = await loginSchema.parseAsync(credentials);
+          const t = await getTranslations('zod');
+          const { email, password } = await loginSchema(t).parseAsync(credentials);
           const user = await userService.login({ email, password });
           return user;
         } catch (error) {

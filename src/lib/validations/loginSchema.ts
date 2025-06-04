@@ -1,12 +1,13 @@
 import { z } from 'zod';
 
-export const loginSchema = z.object({
-  email: z.string().email({ message: '이메일 형식이 올바르지 않습니다.' }),
+export const loginSchema = (t: (key: string) => string) =>
+  z.object({
+    email: z.string().email({ message: t('email') }),
   password: z
     .string()
-    .min(8, { message: '비밀번호는 8자 이상이어야 합니다.' })
+    .min(8, { message: t('passwordMinLength') })
     .regex(/[^a-zA-Z0-9]/, {
-      message: '특수문자를 포함해야 합니다.',
+      message: t('passwordSpecialCharacter'),
     })
     .trim(),
 });
@@ -27,4 +28,4 @@ export type LoginFormState =
     }
   | undefined;
 
-export type LoginForm = z.infer<typeof loginSchema>;
+export type LoginForm = z.infer<ReturnType<typeof loginSchema>>;

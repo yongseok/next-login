@@ -1,25 +1,25 @@
 import { z } from 'zod';
 
-export const signupSchema = z
-  .object({
-    email: z.string().email({ message: '이메일 형식이 올바르지 않습니다.' }),
-    name: z
-      .string()
-      .min(2, { message: '이름은 2자 이상이어야 합니다.' })
-      .optional(),
-    password: z
-      .string()
-      .min(8, { message: '비밀번호는 8자 이상이어야 합니다.' })
-      .regex(/[^a-zA-Z0-9]/, {
-        message: '특수문자를 포함해야 합니다.',
-      })
-      .trim(),
-    confirmPassword: z.string().trim(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ['confirmPassword'],
-    message: '비밀번호가 일치하지 않습니다.',
-  });
+export const signupSchema = (t: (key: string) => string) => z
+    .object({
+    email: z.string().email({ message: t('email') }),
+      name: z
+        .string()
+      .min(2, { message: t('nameMinLength') })
+        .optional(),
+      password: z
+        .string()
+      .min(8, { message: t('passwordMinLength') })
+        .regex(/[^a-zA-Z0-9]/, {
+          message: t('passwordSpecialCharacter'),
+        })
+        .trim(),
+      confirmPassword: z.string().trim(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      path: ['confirmPassword'],
+      message: t('passwordMatch'),
+    });
 
 export type SignupFormErrors = {
   email?: string[];
@@ -36,4 +36,4 @@ export type SignupFormState =
     }
   | undefined;
 
-export type SignupForm = z.infer<typeof signupSchema>;
+export type SignupForm = z.infer<ReturnType<typeof signupSchema>>;

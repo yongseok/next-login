@@ -4,6 +4,7 @@ import { FaGithub } from 'react-icons/fa';
 import { Button } from './ui/button';
 import { Loader2, LogIn } from 'lucide-react';
 import { Session } from 'next-auth';
+import { useTranslations } from 'next-intl';
 
 export default function LoginButton({
   provider,
@@ -17,6 +18,7 @@ export default function LoginButton({
   onClick?: () => void;
   session: Session | null;
 } & React.ComponentProps<'button'>) {
+  const t = useTranslations('login');
   return (
     <Button
       type='button'
@@ -36,7 +38,15 @@ export default function LoginButton({
         </>
       )}
       <span className='font-medium'>
-        {provider}로 {session ? '로그아웃' : '로그인'}
+        {t('withLogin', {
+          provider:
+            provider === 'google'
+              ? 'Google'
+              : provider === 'github'
+              ? 'GitHub'
+              : 'Email',
+          login: session ? t('logout') : t('login'),
+        })}
       </span>
     </Button>
   );

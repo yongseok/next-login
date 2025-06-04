@@ -3,5 +3,6 @@
   "postman.settings.dotenv-detection-notification-visibility": false,
   "i18n-ally.localesPaths": ["messages", "src/i18n"],
   "i18n-ally.sourceLanguage": "ko",
-  "i18n-ally.keystyle": "nested"
+  "i18n-ally.keystyle": "nested",
+  "commentTranslate.targetLanguage": "en"
 }

@@ -91,6 +91,10 @@
 
 - [ ] 다국어 지원
 - [add-on] i18n Ally
+- [ ] LocaleSwitch 구현  
+
+**다국어 포맷 참고자료 (ICU MessageFormat)**  
+https://formatjs.github.io/docs/core-concepts/icu-syntax  
 
 **추가 작업**  
 

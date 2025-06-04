@@ -8,11 +8,14 @@ import { Button } from './ui/button';
 import { LogIn, LogOut, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useSession } from 'next-auth/react';
+import LocaleSwitcher from './LocaleSwitcher';
+import { useTranslations } from 'next-intl';
 
 export function MainNavigation() {
   const { status } = useSession();
   const pathname = usePathname();
-  const routes = useMemo(() => getRoutes(pathname), [pathname]);
+  const t = useTranslations('mainNavigation');
+  const routes = useMemo(() => getRoutes(pathname, t), [pathname, t]);
   const { theme, setTheme } = useTheme();
   return (
     <nav className='flex items-center gap-4 justify-between'>
@@ -45,6 +48,7 @@ export function MainNavigation() {
             </Link>
           </Button>
         )}
+        <LocaleSwitcher />
         <UserSheet />
         <Button
           variant='ghost'

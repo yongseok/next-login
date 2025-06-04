@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { signupAction } from '@/app/actions/auth';
 import { signIn } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 
 export default function useSignup() {
   const [provider, setProvider] = useState<
@@ -18,7 +19,7 @@ export default function useSignup() {
 
   // 폼 유효성 검사
   const form = useForm<SignupFormType>({
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolver(signupSchema(useTranslations('zod.signup'))),
     defaultValues: {
       email: '',
       password: '',
@@ -32,7 +33,6 @@ export default function useSignup() {
     message: '',
     errors: {},
   });
-  console.log('1 🚀 | useSignup | state:', state);
 
   useEffect(() => {
     if (state.success === false && state.message) {
