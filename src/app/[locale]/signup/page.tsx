@@ -1,10 +1,10 @@
 import SignupForm from './components/SignupForm';
 
-export default function SignupPage({
-  params: { locale },
+export default async function SignupPage({
+  params,
 }: {
   params: { locale: string };
 }) {
-  console.log('🚀 | locale:', locale);
+  // const { locale } = await params;
   return <SignupForm />;
 }

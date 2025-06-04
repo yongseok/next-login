@@ -89,9 +89,10 @@
 
 **2025.06.02-03**
 
-- [ ] 다국어 지원
+- [X] 다국어 지원
 - [add-on] i18n Ally
-- [ ] LocaleSwitch 구현  
+- [X] LocaleSwitch 구현  
+- zod v4를 적용하려고 했는데, react-hook-form `zodResolver`가 zod v4를 지원하지 않아 보류(필요 시 `https://github.com/react-hook-form/resolvers/pull/776` 참고)
 
 **다국어 포맷 참고자료 (ICU MessageFormat)**  
 https://formatjs.github.io/docs/core-concepts/icu-syntax  
