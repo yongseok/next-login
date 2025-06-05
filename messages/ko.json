@@ -31,7 +31,10 @@
     "withLogin": "{provider}로 {login}",
     "or": "또는",
     "email": "이메일",
-    "password": "비밀번호"
+    "password": "비밀번호",
+    "loading": "로딩중...",
+    "credentialsLogin": "이메일로 로그인",
+    "githubLogin": "GitHub로 로그인"
   },
   "userSheet": {
     "title": "사용자 정보",

@@ -47,7 +47,7 @@ export function UserAuthForm({
             {isLoading && (
               <Icons.spinner className='mr-2 h-4 w-4 animate-spin' />
             )}
-            {t('credentialsLogin')}
+            {isLoading ? t('loading') : t('credentialsLogin')}
           </Button>
         </div>
       </form>
@@ -67,7 +67,7 @@ export function UserAuthForm({
         ) : (
           <Icons.gitHub className='mr-2 h-4 w-4' />
         )}{' '}
-        {t('githubLogin')}
+        {isLoading ? t('loading') : t('githubLogin')}
       </Button>
     </div>
   );

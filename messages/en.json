@@ -31,7 +31,10 @@
     "withLogin": "{login} with {provider}",
     "or": "Or continue with",
     "email": "Email",
-    "password": "password"
+    "password": "password",
+    "loading": "Loading...",
+    "credentialsLogin": "Login with Email",
+    "githubLogin": "Login with GitHub"
   },
   "userSheet": {
     "title": "User Information",

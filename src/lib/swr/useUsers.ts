@@ -36,10 +36,10 @@ export const useUpdateUser = (email: string) => {
 };
 
 export const useGetUserByEmail = (email: string) => {
-  const encodedEmail = encodeURIComponent(email);
+  const encodedEmail = email ? encodeURIComponent(email) : null;
   const { data, error, isLoading } = useSWR(
-    API_ENDPOINTS.USERS.GET(encodedEmail),
-    getUserByEmail,
+    encodedEmail ? API_ENDPOINTS.USERS.GET(encodedEmail) : null,
+    getUserByEmail
   );
 
   return {

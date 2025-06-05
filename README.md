@@ -87,7 +87,7 @@
 - [X] UI/로직 구조 통일
   - Signup, Login 모두 "공통 컴포넌트 + 커스텀 훅" 패턴으로 통일.
 
-**2025.06.02-03**
+**2025.06.02-03**  
 
 - [X] 다국어 지원
 - [add-on] i18n Ally
@@ -96,6 +96,10 @@
 
 **다국어 포맷 참고자료 (ICU MessageFormat)**  
 https://formatjs.github.io/docs/core-concepts/icu-syntax  
+
+**2025.06.05**  
+- [ ] cookie, session 로직 확인
+- [ ] next-auth strategy `database`로 전환  
 
 **추가 작업**  
 
