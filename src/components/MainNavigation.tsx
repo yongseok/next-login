@@ -2,7 +2,7 @@
 import { getRoutes } from '@/lib/getRoutes';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { UserSheet } from './UserSheet';
 import { Button } from './ui/button';
 import { LogIn, LogOut, Moon, Sun } from 'lucide-react';
@@ -17,6 +17,11 @@ export function MainNavigation() {
   const t = useTranslations('mainNavigation');
   const routes = useMemo(() => getRoutes(pathname, t), [pathname, t]);
   const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <nav className='flex items-center gap-4 justify-between'>
       <div className='flex items-center gap-4'>
@@ -55,11 +60,13 @@ export function MainNavigation() {
           size='icon'
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
-          {theme === 'dark' ? (
-            <Sun className='w-4 h-4' />
-          ) : (
-            <Moon className='w-4 h-4' />
-          )}
+          {mounted ? (
+            theme === 'dark' ? (
+              <Sun className='w-4 h-4' />
+            ) : (
+              <Moon className='w-4 h-4' />
+            )
+          ) : null}
         </Button>
       </div>
     </nav>
