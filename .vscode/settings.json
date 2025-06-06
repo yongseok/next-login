@@ -4,5 +4,14 @@
   "i18n-ally.localesPaths": ["messages", "src/i18n"],
   "i18n-ally.sourceLanguage": "ko",
   "i18n-ally.keystyle": "nested",
-  "commentTranslate.targetLanguage": "en"
+  "commentTranslate.targetLanguage": "en",
+  "sqltools.useNodeRuntime": true,
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "toy",
+      "database": "${workspaceFolder:login}/prisma/dev.db"
+    }
+  ]
 }

@@ -7,6 +7,8 @@ import { loginSchema } from './lib/validations/loginSchema';
 import { Role } from '@prisma/client';
 import { AppError } from './lib/errors/errors';
 import { getTranslations } from 'next-intl/server';
+import { PrismaAdapter } from '@auth/prisma-adapter';
+import { prisma } from '@/lib/database/prisma';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   debug: true,
@@ -23,7 +25,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       authorize: async (credentials) => {
         try {
           const t = await getTranslations('zod');
-          const { email, password } = await loginSchema(t).parseAsync(credentials);
+          const { email, password } = await loginSchema(t).parseAsync(
+            credentials
+          );
           const user = await userService.login({ email, password });
           return user;
         } catch (error) {
@@ -59,6 +63,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  adapter: PrismaAdapter(prisma),
   session: {
     strategy: 'jwt',
   },
@@ -71,12 +76,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (user.email) {
           const findUser = await userService.getUserByEmail(user.email);
           if (!findUser) {
-            await userService.signup({
-              email: user.email,
-              name: user.name,
-              password: '',
-              role: Role.USER,
-            });
+            // await userService.signup({
+            //   email: user.email,
+            //   name: user.name,
+            //   password: '',
+            //   role: Role.USER,
+            // });
           } else {
             // OAuth 로그인 시 사용자 정보를 내 서버 정보로 업데이트 해야 함
             user.name = findUser?.name ?? user.name;
@@ -98,7 +103,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return { ...token, ...session.user };
       }
 
-      if (user && user.role) {
+      // 🔑 user 정보를 토큰에 저장(토큰 생성 시에만 user 정보가 있음)
+      if (user) {
         token.role = user.role;
       }
       return token;
@@ -106,9 +112,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     // 세션 생성 시 사용자 정보 추가
     // 호출 시점: 세션 생성 시 호출(useSession(), auth() 호출 시)
     async session({ session, token }) {
-      session.user.id = token.id as string;
-      session.user.role = token.role as Role;
-      return session;
+      try {
+        if (token?.id && session.user) {
+          session.user.id = token.id as string;
+        }
+        if (token?.role && session.user) {
+          session.user.role = token.role as Role;
+        }
+      } catch (error) {
+        console.error('🚀 | session | error:', error);
+      } finally {
+        return session;
+      }
     },
   },
   pages: {
