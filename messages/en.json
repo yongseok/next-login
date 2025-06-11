@@ -51,6 +51,7 @@
   },
   "mainNavigation": {
     "home": "Home",
+    "gallery": "Gallery",
     "about": "About"
   },
   "zod": {

@@ -51,6 +51,7 @@
   },
   "mainNavigation": {
     "home": "홈",
+    "gallery": "갤러리",
     "about": "소개"
   },
   "zod": {

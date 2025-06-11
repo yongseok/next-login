@@ -41,7 +41,7 @@ export default auth((req) => {
 // 미들웨어 적용 범위 설정
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)', // API, 정적 파일 등 제외
+    '/((?!api|_next/static|_next/image|favicon.ico|placeholder.svg).*)', // API, 정적 파일 등 제외
     // '/([\\w-]+)?/users/(.+)', // 동적 경로 처리
   ],
 };

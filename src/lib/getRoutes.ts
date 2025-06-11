@@ -1,4 +1,4 @@
-import { Home, Info } from 'lucide-react';
+import { Home, Info, Image } from 'lucide-react';
 
 export const getRoutes = (pathname: string, t: (key: string) => string) => {
   const routes = [
@@ -7,6 +7,12 @@ export const getRoutes = (pathname: string, t: (key: string) => string) => {
       label: t('home'),
       icon: Home,
       active: pathname === '/',
+    },
+    {
+      href: '/gallery',
+      label: t('gallery'),
+      icon: Image,
+      active: pathname === '/gallery',
     },
     {
       href: '/about',
