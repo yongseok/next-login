@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { MediaItem } from '../page';
 import {
   ChevronLeft,
@@ -7,6 +7,7 @@ import {
   Download,
   Heart,
   Maximize2,
+  Minimize2,
   Play,
   Share2,
 } from 'lucide-react';
@@ -14,6 +15,7 @@ import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import ActionButton from './ActionButton';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 export default function LightboxModal({
   isModalOpen,
@@ -65,13 +67,18 @@ export default function LightboxModal({
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
       <DialogContent
-        className={` overflow-y-auto ${
-          isFullScreen ? 'w-full h-full' : 'max-w-4xl max-h-full'
+        className={` transition-all duration-500 ease-in-out overflow-y-auto ${
+          isFullScreen ? 'h-full w-full max-w-full' : 'max-w-4xl max-h-full'
         }`}
       >
-        <div className='mt-5'>
+        <div className='mt-5 flex flex-col  items-center'>
+          <VisuallyHidden>
+            <DialogTitle>
+              {filteredItems[currentIndex]?.title || 'Image'}
+            </DialogTitle>
+          </VisuallyHidden>
           {/* Media Content */}
-          <div className='relative h-fit'>
+          <div className='relative h-fit w-full transition-all duration-500 ease-in-out'>
             <Image
               src={
                 filteredItems[currentIndex].thumbnail ||
@@ -80,25 +87,32 @@ export default function LightboxModal({
               alt={filteredItems[currentIndex].title}
               width={1000}
               height={1000}
-              className={`w-full object-contain rounded-lg`}
+              className={`w-full object-contain rounded-lg z-50 transition-all duration-500 ease-in-out ${
+                isFullScreen ? 'hover:cursor-zoom-out' : 'hover:cursor-zoom-in'
+              }`}
+              onClick={handleFullScreen}
             />
             {/* full screen button */}
             <div className='absolute bottom-4 right-4'>
               <Button
-                variant='outline'
+                variant='ghost'
                 size='icon'
-                className='hover:cursor-pointer opacity-70 hover:opacity-100 transition-opacity'
+                className='w-6 h-6 hover:bg-transparent'
                 onClick={handleFullScreen}
               >
-                <Maximize2 className='w-4 h-4 ' />
+                {isFullScreen ? (
+                  <Minimize2 color='white' />
+                ) : (
+                  <Maximize2 color='white' />
+                )}
               </Button>
             </div>
             {/* Navigation Buttons */}
             {filteredItems.length > 1 && (
-              <div className='absolute flex justify-between w-full opacity-50 top-1/2 transform -translate-y-1/2 z-50 px-4'>
+              <div className='absolute flex justify-between w-full top-1/2 transform -translate-y-1/2 z-0 px-4'>
                 <Button
-                  className='w-10 h-10'
-                  variant='ghost'
+                  className='w-10 h-10 bg-card text-card-foreground border-border hover:bg-accent hover:text-accent-foreground hover:cursor-pointer opacity-70 hover:opacity-100 transition-opacity'
+                  variant='default'
                   size='icon'
                   onClick={() =>
                     setCurrentIndex((index) =>
@@ -109,8 +123,8 @@ export default function LightboxModal({
                   <ChevronLeft className='w-8 h-8' />
                 </Button>
                 <Button
-                  className='w-10 h-10'
-                  variant='ghost'
+                  className='w-10 h-10 bg-card text-card-foreground border-border hover:bg-accent hover:text-accent-foreground hover:cursor-pointer opacity-70 hover:opacity-100 transition-opacity'
+                  variant='default'
                   size='icon'
                   onClick={() =>
                     setCurrentIndex((index) =>
@@ -118,7 +132,7 @@ export default function LightboxModal({
                     )
                   }
                 >
-                  <ChevronRight className='w-8 h-8 text-primary' size={32} />
+                  <ChevronRight className='w-8 h-8' size={32} />
                 </Button>
               </div>
             )}
@@ -145,11 +159,21 @@ export default function LightboxModal({
             </div>
           </div>
           {/* Image Info */}
-          <div className={`mt-5 ${isFullScreen ? 'hidden' : ''}`}>
-            <h2 className='text-lg font-bold text-primary'>
+          <div
+            className={`sticky bottom-0 mt-5 z-10
+              bg-card/30 p-2 rounded-lg w-fit flex flex-col items-center justify-center
+              transition-all duration-500 ease-in-out
+              ${
+                isFullScreen
+                  ? 'hidden pointer-events-none'
+                  : 'pointer-events-auto'
+              }
+            `}
+          >
+            <h2 className='text-lg font-bold text-card-foreground'>
               {filteredItems[currentIndex].title}
             </h2>
-            <p className='text-sm text-muted-foreground mb-2'>
+            <p className='text-sm text-card-foreground/80 mb-2'>
               {filteredItems[currentIndex].category}
             </p>
             {/* Tags */}
@@ -158,7 +182,7 @@ export default function LightboxModal({
                 return <Badge key={tag}>{tag}</Badge>;
               })}
             </div>
-            <div className='flex justify-between font-bold text-primary/80'>
+            <div className='flex justify-between font-bold text-primary/80 space-x-5'>
               <div className='flex items-center gap-2'>
                 <Heart className='w-4 h-4' />
                 <p>{filteredItems[currentIndex].likes} likes</p>

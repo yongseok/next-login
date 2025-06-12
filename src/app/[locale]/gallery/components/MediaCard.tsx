@@ -65,11 +65,11 @@ export default function MediaCard({
 
         {/* Video Play Button */}
         {type === 'video' && (
-          <div className='absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity'>
+          <div className='absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity'>
             <Button
               size='icon'
               variant='ghost'
-              className='w-12 h-12 rounded-full bg-primary-foreground/80 text-primary hover:bg-primary-foreground hover:cursor-pointer'
+              className='w-12 h-12 rounded-full bg-card/80 text-card-foreground hover:bg-accent hover:text-accent-foreground hover:cursor-pointer'
               onClick={() => {
                 console.log('Played');
               }}

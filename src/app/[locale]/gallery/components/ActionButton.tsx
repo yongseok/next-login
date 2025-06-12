@@ -13,9 +13,9 @@ export default function ActionButton({
 }) {
   return (
     <Button
-      variant='secondary'
+      variant='default'
       size='sm'
-      className='w-8 h-8 rounded-full hover:cursor-pointer opacity-80 hover:opacity-100 transition-opacity'
+      className='w-8 h-8 bg-card text-card-foreground border-border hover:bg-accent hover:text-accent-foreground rounded-full hover:cursor-pointer opacity-80 hover:opacity-100 transition-opacity'
       onClick={onClick || undefined}
       disabled={disabled}
       {...props}
