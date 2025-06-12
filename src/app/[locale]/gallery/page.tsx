@@ -306,6 +306,7 @@ export default function GalleryPage() {
         filteredItems={filteredItems}
         toggleLike={toggleLike}
         currentId={currentId}
+        likedItems={likedItems}
       />
     </div>
   );
