@@ -81,7 +81,7 @@ export default function LightboxModal({
           <div className='relative h-fit w-full transition-all duration-500 ease-in-out'>
             <Image
               src={
-                filteredItems[currentIndex].thumbnail ||
+                filteredItems[currentIndex]?.thumbnail ||
                 'https://picsum.photos/112312312sfsgfgsgsf123'
               }
               alt={filteredItems[currentIndex].title}

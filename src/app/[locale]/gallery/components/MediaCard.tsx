@@ -68,8 +68,8 @@ export default function MediaCard({
           <div className='absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity'>
             <Button
               size='icon'
-              variant='ghost'
-              className='w-12 h-12 rounded-full bg-card/80 text-card-foreground hover:bg-accent hover:text-accent-foreground hover:cursor-pointer'
+              variant='default'
+              className='w-12 h-12 rounded-full bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground hover:cursor-pointer opacity-80 hover:opacity-100 transition-opacity'
               onClick={() => {
                 console.log('Played');
               }}

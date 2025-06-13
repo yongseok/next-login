@@ -14,7 +14,7 @@ import MediaCard from './components/MediaCard';
 import MediaList from './components/MediaList';
 import LightboxModal from './components/LightboxModal';
 
-const mediaItems = [
+const mediaItems: GalleryProps[] = [
   {
     id: 1,
     type: 'image',
@@ -116,17 +116,7 @@ const mediaItems = [
   },
 ] as const;
 
-export type MediaItem = (typeof mediaItems)[number];
 
-const categories = [
-  'All',
-  'Nature',
-  'Urban',
-  'Art',
-  'Lifestyle',
-  'Design',
-  'Technology',
-];
 
 export default function GalleryPage() {
   const [searchTerm, setSearchTerm] = useState('');
