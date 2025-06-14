@@ -13,10 +13,12 @@ import { useState } from 'react';
 import MediaCard from './components/MediaCard';
 import MediaList from './components/MediaList';
 import LightboxModal from './components/LightboxModal';
+import { categories, MediaItem } from '@/types/gallery';
+import { toast } from 'sonner';
 
-const mediaItems: GalleryProps[] = [
+const mediaItems: MediaItem[] = [
   {
-    id: 1,
+    id: 0,
     type: 'image',
     title: 'Mountain Landscape',
     category: 'Nature',
@@ -27,21 +29,22 @@ const mediaItems: GalleryProps[] = [
     width: 2300,
     height: 1500,
   },
+  // {
+  //   id: 1,
+  //   type: 'video',
+  //   title: 'City Timelapse',
+  //   category: 'Urban',
+  //   tags: ['city', 'timelapse', 'urban'],
+  //   thumbnail: 'https://picsum.photos/1300/1500/?random=2',
+  //   likes: 89,
+  //   downloads: 23,
+  //   duration: '2:34',
+  //   width: 1300,
+  //   height: 1500,
+  //   url: 'https://youtu.be/VGkoaHyVUdg?si=Emgmqww88AnqOHT0',
+  // },
   {
     id: 2,
-    type: 'video',
-    title: 'City Timelapse',
-    category: 'Urban',
-    tags: ['city', 'timelapse', 'urban'],
-    thumbnail: 'https://picsum.photos/1300/1500/?random=2',
-    likes: 89,
-    downloads: 23,
-    duration: '2:34',
-    width: 1300,
-    height: 1500,
-  },
-  {
-    id: 3,
     type: 'image',
     title: 'Abstract Art',
     category: 'Art',
@@ -53,7 +56,7 @@ const mediaItems: GalleryProps[] = [
     height: 1500,
   },
   {
-    id: 4,
+    id: 3,
     type: 'image',
     title: 'Ocean Waves',
     category: 'Nature',
@@ -65,7 +68,7 @@ const mediaItems: GalleryProps[] = [
     height: 1500,
   },
   {
-    id: 5,
+    id: 4,
     type: 'video',
     title: 'Coffee Shop',
     category: 'Lifestyle',
@@ -73,12 +76,13 @@ const mediaItems: GalleryProps[] = [
     thumbnail: 'https://picsum.photos/3200/1500/?random=5',
     likes: 78,
     downloads: 34,
-    duration: '1:45',
     width: 3200,
     height: 1500,
+    url: '/video/sample1.mp4',
+    duration: '1:45',
   },
   {
-    id: 6,
+    id: 5,
     type: 'image',
     title: 'Minimalist Design',
     category: 'Design',
@@ -90,7 +94,7 @@ const mediaItems: GalleryProps[] = [
     height: 1500,
   },
   {
-    id: 7,
+    id: 6,
     type: 'image',
     title: 'Forest Path',
     category: 'Nature',
@@ -102,7 +106,7 @@ const mediaItems: GalleryProps[] = [
     height: 1500,
   },
   {
-    id: 8,
+    id: 7,
     type: 'video',
     title: 'Tech Animation',
     category: 'Technology',
@@ -110,13 +114,12 @@ const mediaItems: GalleryProps[] = [
     thumbnail: 'https://picsum.photos/2600/3500/?random=8',
     likes: 234,
     downloads: 98,
-    duration: '3:12',
     width: 1600,
     height: 1500,
+    url: '/video/sample2.mp4',
+    duration: '3:12',
   },
-] as const;
-
-
+];
 
 export default function GalleryPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -137,10 +140,27 @@ export default function GalleryPage() {
     return matchesSearch && matchesCategory;
   });
 
+  const handleOpenMediaModal = (id: number) => {
+    setCurrentId(id);
+    setIsModalOpen(true);
+  };
+
   const toggleLike = (id: number) => {
     setLikedItems((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
+  };
+
+  const onCopyLink = (url: string) => {
+    navigator.clipboard.writeText(url);
+    toast.success('Link copied to clipboard');
+  };
+
+  const onDownload = (url: string) => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'download';
+    a.click();
   };
 
   return (
@@ -224,28 +244,22 @@ export default function GalleryPage() {
           ))}
         </div>
 
+        {/* Media List */}
         {viewMode === 'grid' ? (
           <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
             {filteredItems.map((item) => (
               <MediaCard
                 key={item.id}
-                id={item.id}
-                type={item.type as 'image' | 'video'}
-                title={item.title}
-                category={item.category}
-                tags={item.tags}
-                thumbnail={item.thumbnail}
-                likes={item.likes}
-                downloads={item.downloads}
-                duration={item.duration}
-                width={item.width}
-                height={item.height}
-                onClick={() => {
-                  setCurrentId(item.id);
-                  setIsModalOpen(true);
-                }}
-                toggleLike={toggleLike}
+                item={item}
                 likedItems={likedItems}
+                openMediaModal={() => handleOpenMediaModal(item.id)}
+                toggleLike={() => toggleLike(item.id)}
+                onCopyLink={() => {
+                  onCopyLink(item.thumbnail || '');
+                }}
+                onDownload={() => {
+                  onDownload(item.thumbnail || '');
+                }}
               />
             ))}
           </div>
@@ -254,21 +268,15 @@ export default function GalleryPage() {
             {filteredItems.map((item) => (
               <MediaList
                 key={item.id}
-                id={item.id}
-                type={item.type as 'image' | 'video'}
-                title={item.title}
-                category={item.category}
-                tags={item.tags}
-                thumbnail={item.thumbnail}
-                likes={item.likes}
-                downloads={item.downloads}
-                duration={item.duration}
-                width={item.width}
-                height={item.height}
-                toggleLike={toggleLike}
+                item={item}
                 likedItems={likedItems}
-                onClick={() => {
-                  setIsModalOpen(true);
+                openMediaModal={() => handleOpenMediaModal(item.id)}
+                toggleLike={() => toggleLike(item.id)}
+                onCopyLink={() => {
+                  onCopyLink(item.thumbnail || '');
+                }}
+                onDownload={() => {
+                  onDownload(item.thumbnail || '');
                 }}
               />
             ))}
@@ -290,13 +298,16 @@ export default function GalleryPage() {
           </div>
         )}
       </div>
+      {/* Lightbox Modal */}
       <LightboxModal
-        isModalOpen={isModalOpen}
-        setIsModalOpen={setIsModalOpen}
         filteredItems={filteredItems}
-        toggleLike={toggleLike}
         currentId={currentId}
         likedItems={likedItems}
+        toggleLike={toggleLike}
+        isModalOpen={isModalOpen}
+        setIsModalOpen={setIsModalOpen}
+        onCopyLink={onCopyLink}
+        onDownload={onDownload}
       />
     </div>
   );

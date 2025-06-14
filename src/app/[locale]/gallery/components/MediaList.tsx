@@ -3,53 +3,28 @@ import { Badge } from '@/components/ui/badge';
 import { Download, Heart, Share2 } from 'lucide-react';
 import Image from 'next/image';
 import ActionButton from './ActionButton';
+import { MediaItem } from '@/types/gallery';
 
 interface MediaItemProps {
-  id: number;
-  type: 'image' | 'video';
-  title: string;
-  category: string;
-  tags: string[];
-  thumbnail: string;
-  likes?: number;
-  downloads?: number;
-  duration?: string;
-  width: number;
-  height: number;
-  onClick: () => void;
-  toggleLike: (id: number) => void;
+  item: MediaItem;
   likedItems: number[];
+  openMediaModal: () => void;
+  toggleLike: () => void;
+  onCopyLink: () => void;
+  onDownload: () => void;
 }
 
 export default function MediaList({
-  id,
-  type,
-  title,
-  category,
-  tags,
-  thumbnail,
-  likes,
-  downloads,
-  duration,
-  width,
-  height,
-  onClick,
-  toggleLike,
+  item,
   likedItems,
+  openMediaModal,
+  toggleLike,
+  onCopyLink,
+  onDownload,
 }: MediaItemProps) {
-  console.log(
-    id,
-    type,
-    title,
-    category,
-    tags,
-    thumbnail,
-    likes,
-    downloads,
-    duration,
-    width,
-    height
-  );
+  const { id, type, title, category, tags, thumbnail, likes, downloads, duration } =
+    item;
+
   return (
     <Card className='overflow-hidden border-0 shadow-md hover:shadow-lg transition-shadow py-0'>
       <CardContent className='p-0'>
@@ -60,7 +35,7 @@ export default function MediaList({
               alt={title}
               fill
               className='w-full h-full object-cover hover:cursor-pointer'
-              onClick={onClick}
+              onClick={openMediaModal}
             />
             {type === 'video' && duration && (
               <Badge className='absolute bottom-1 right-1 text-xs bg-black/70 text-white'>
@@ -94,17 +69,17 @@ export default function MediaList({
           </div>
 
           <div className='flex flex-col gap-1'>
-            <ActionButton onClick={() => toggleLike(id)}>
+            <ActionButton onClick={toggleLike}>
               <Heart
                 className={`w-4 h-4 ${
                   likedItems.includes(id) ? 'fill-red-500 text-red-500' : ''
                 }`}
               />
             </ActionButton>
-            <ActionButton>
+            <ActionButton onClick={onCopyLink}>
               <Share2 className='w-4 h-4' />
             </ActionButton>
-            <ActionButton>
+            <ActionButton onClick={onDownload}>
               <Download className='w-4 h-4' />
             </ActionButton>
           </div>

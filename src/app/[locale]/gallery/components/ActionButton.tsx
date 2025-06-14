@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 export default function ActionButton({
   children,
@@ -15,9 +16,13 @@ export default function ActionButton({
     <Button
       variant='default'
       size='sm'
-      className='w-8 h-8 bg-card text-card-foreground border-border hover:bg-accent hover:text-accent-foreground rounded-full hover:cursor-pointer opacity-80 hover:opacity-100 transition-opacity'
+      className={cn(
+        'w-8 h-8 bg-card text-card-foreground border-border hover:bg-accent hover:text-accent-foreground rounded-full hover:cursor-pointer opacity-80 hover:opacity-100 transition-opacity',
+        props?.className
+      )}
       onClick={onClick || undefined}
       disabled={disabled}
+
       {...props}
     >
       {children}

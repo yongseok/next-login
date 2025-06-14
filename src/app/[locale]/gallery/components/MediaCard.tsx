@@ -4,41 +4,26 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Download, Heart, Play, Share2 } from 'lucide-react';
 import Image from 'next/image';
 import ActionButton from './ActionButton';
+import { MediaItem } from '@/types/gallery';
 
 interface MediaItemProps {
-  id: number;
-  type: 'image' | 'video';
-  title: string;
-  category: string;
-  tags: string[];
-  thumbnail: string;
-  likes?: number;
-  downloads?: number;
-  duration?: string;
-  width: number;
-  height: number;
-  onClick: () => void;
-  toggleLike: (id: number) => void;
+  item: MediaItem;
   likedItems: number[];
+  openMediaModal: () => void;
+  toggleLike: () => void;
+  onCopyLink: () => void;
+  onDownload: () => void;
 }
 
 export default function MediaCard({
-  id,
-  type,
-  title,
-  category,
-  tags,
-  thumbnail,
-  likes,
-  downloads,
-  duration,
-  width,
-  height,
-  onClick,
-  toggleLike,
+  item,
   likedItems,
+  openMediaModal,
+  toggleLike,
+  onCopyLink,
+  onDownload,
 }: MediaItemProps) {
-  console.log(
+  const {
     id,
     type,
     title,
@@ -49,8 +34,8 @@ export default function MediaCard({
     downloads,
     duration,
     width,
-    height
-  );
+    height,
+  } = item;
   return (
     <Card className='group overflow-hidden p-0 border-0 shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 gap-0'>
       <div className='relative overflow-hidden'>
@@ -60,7 +45,7 @@ export default function MediaCard({
           width={width}
           height={height}
           className='w-full h-98 object-cover transition-transform duration-300 group-hover:scale-110 hover:cursor-pointer'
-          onClick={onClick}
+          onClick={openMediaModal}
         />
 
         {/* Video Play Button */}
@@ -70,9 +55,7 @@ export default function MediaCard({
               size='icon'
               variant='default'
               className='w-12 h-12 rounded-full bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground hover:cursor-pointer opacity-80 hover:opacity-100 transition-opacity'
-              onClick={() => {
-                console.log('Played');
-              }}
+              onClick={openMediaModal}
             >
               <Play className='w-10 h-10' />
             </Button>
@@ -81,29 +64,17 @@ export default function MediaCard({
 
         {/* Overlay Actions */}
         <div className='absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity'>
-          <ActionButton
-            onClick={() => {
-              toggleLike(id);
-            }}
-          >
+          <ActionButton onClick={toggleLike}>
             <Heart
               className={`w-4 h-4 ${
                 likedItems.includes(id) ? 'fill-red-500 text-red-500' : ''
               }`}
             />
           </ActionButton>
-          <ActionButton
-            onClick={() => {
-              console.log('Shared');
-            }}
-          >
+          <ActionButton onClick={onCopyLink}>
             <Share2 className='w-4 h-4' />
           </ActionButton>
-          <ActionButton
-            onClick={() => {
-              console.log('Downloaded');
-            }}
-          >
+          <ActionButton onClick={onDownload}>
             <Download className='w-4 h-4' />
           </ActionButton>
         </div>
