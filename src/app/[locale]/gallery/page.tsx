@@ -164,8 +164,8 @@ export default function GalleryPage() {
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-background to-muted p-4'>
-      <div className='max-w-7xl'>
+    <div className='min-h-screen bg-gradient-to-br from-background to-muted p-4 w-full max-w-7xl mx-auto'>
+      <div className='w-full'>
         {/* Header */}
         <div className='mb-8'>
           <h1 className='text-4xl font-bold text-primary mb-2'>

@@ -168,7 +168,7 @@ export default function UploadPage() {
     console.log('Files:', files);
   };
   return (
-    <div className='w-full max-w-4xl mx-auto p-4 sm:p-6'>
+    <div className='w-full max-w-7xl mx-auto p-4 sm:p-6'>
       <Card>
         <CardHeader>
           <CardTitle>{t('title')}</CardTitle>
@@ -257,7 +257,11 @@ export default function UploadPage() {
             )}
             {/* 제출 버튼 */}
             <div className='flex flex-col sm:flex-row justify-end gap-2 mt-4'>
-              <Button type='button' variant='outline' onClick={() => setFiles([])}>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() => setFiles([])}
+              >
                 {t('cancel')}
               </Button>
               <Button type='submit' disabled={isUploading}>
