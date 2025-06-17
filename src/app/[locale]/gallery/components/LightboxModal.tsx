@@ -76,6 +76,10 @@ export default function LightboxModal(props: GalleryProps) {
     };
   });
 
+  if (!selectedItem) {
+    return null;
+  }
+
   return (
     <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
       <DialogContent

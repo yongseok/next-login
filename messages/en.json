@@ -76,5 +76,26 @@
     "invalid_string": {
       "min": "Must be at least {{min}} characters long."
     }
+  },
+  "upload": {
+    "title": "File upload",
+    "description": "Select multiple files or upload with drag and drop.",
+    "submit": "{Count} Upload",
+    "titlePlaceholder": "Enter the upload title",
+    "titleRequired": "Please enter the title.",
+    "descriptionlabel": "explanation",
+    "descriptionRequired": "Please enter the description (optional)",
+    "descriptionPlaceholder": "Please enter the description (optional)",
+    "noFilesSelected": "Please select at least one file.",
+    "uploadSuccess": "All files have been uploaded successfully!",
+    "unknown file": "Unknown file",
+    "cancel": "Delete all",
+    "error": "failure",
+    "dragAndDrop": "Drag or click the file here to select",
+    "supportedFormats": "Support for all files such as PNG, JPG, PDF, DOC",
+    "pending": "In the atmosphere",
+    "success": "complete",
+    "titlelabel": "title",
+    "uploading": "Uploading"
   }
 }

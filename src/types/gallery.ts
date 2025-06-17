@@ -33,3 +33,14 @@ export type GalleryProps = {
   onDownload: (url: string) => void;
   setIsModalOpen: (isModalOpen: boolean) => void;
 };
+
+// upload page
+export interface FileWithPreview extends File {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  preview?: string;
+  progress?: number;
+  status?: 'pending' | 'uploading' | 'success' | 'error';
+}
