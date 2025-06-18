@@ -15,6 +15,7 @@ import MediaList from './components/MediaList';
 import LightboxModal from './components/LightboxModal';
 import { categories, MediaItem } from '@/types/gallery';
 import { toast } from 'sonner';
+import UploadDialog from './components/UploadDialog';
 
 const mediaItems: MediaItem[] = [
   {
@@ -165,6 +166,7 @@ export default function GalleryPage() {
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-background to-muted p-4 w-full max-w-7xl mx-auto'>
+      <UploadDialog />
       <div className='w-full'>
         {/* Header */}
         <div className='mb-8'>
