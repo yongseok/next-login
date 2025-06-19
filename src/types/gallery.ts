@@ -42,5 +42,5 @@ export interface FileWithPreview extends File {
   type: string;
   preview?: string;
   progress?: number;
-  status?: 'pending' | 'uploading' | 'success' | 'error';
+  status?: 'pending' | 'uploading' | 'success' | 'canceled' | 'error';
 }

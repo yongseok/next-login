@@ -13,21 +13,24 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { useForm } from 'react-hook-form';
-import SelectedItem from '../upload/components/selectedItem';
+import FileCard from '../upload/components/FileCard';
+import { Plus } from 'lucide-react';
+import { useState } from 'react';
+import { FileWithPreview } from '@/types/gallery';
 
 export default function UploadDialog() {
+  const [selectedFiles, setSelectedFiles] = useState<FileWithPreview[]>([]);
   const {
     register,
     handleSubmit,
-    watch,
+    setError,
+    reset,
     formState: { errors },
   } = useForm<{
     title: string;
     description: string;
     files: FileList;
   }>();
-  console.log('🚀 | UploadDialog | errors:', errors);
-  const selectedFiles = watch('files');
 
   const onSubmit = (data: {
     title: string;
@@ -35,20 +38,98 @@ export default function UploadDialog() {
     files: FileList;
   }) => {
     console.log('🚀 | onSubmit | data:', data);
+    if (selectedFiles.length === 0) {
+      setError('files', {
+        type: 'required',
+        message: 'Please select at least one file',
+      });
+      return;
+    }
+    const uploadPromises = selectedFiles
+      .filter((file) => file.status !== 'success')
+      .map(simulateUpload);
+    Promise.all(uploadPromises).then((results) => {
+      console.log('🚀 | onSubmit | results:', results);
+    });
+  };
+
+  const simulateUpload = (file: FileWithPreview) => {
+    let progress = 0;
+    return new Promise<void>((resolve) => {
+      const interval = setInterval(() => {
+        if (progress >= 100) {
+          clearInterval(interval);
+          setSelectedFiles((prevFiles) =>
+            prevFiles.map((f) =>
+              f.id === file.id ? { ...f, status: 'error', progress: 100 } : f
+            )
+          );
+          resolve();
+        } else {
+          progress += Math.random() * 10;
+          setSelectedFiles((prevFiles) =>
+            prevFiles.map((f) =>
+              f.id === file.id
+                ? {
+                    ...f,
+                    progress,
+                    status: 'uploading',
+                  }
+                : f
+            )
+          );
+        }
+      }, 300);
+    });
   };
 
   const removeFile = (id: string) => {
-    console.log(id);
+    setSelectedFiles(selectedFiles.filter((file) => file.id !== id));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedFiles((prevFiles) => {
+      const existSet = new Set(
+        prevFiles.map((file) => `${file.name}_${file.size}`)
+      );
+      const newFiles: FileWithPreview[] = Array.from(e.target.files || [])
+        .filter((file) => !existSet.has(`${file.name}_${file.size}`))
+        .map((file) => ({
+          ...file,
+          id: crypto.randomUUID(),
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          status: 'pending',
+          preview: file.type.startsWith('image')
+            ? URL.createObjectURL(file)
+            : undefined,
+        }));
+
+      const newFileList = [...prevFiles, ...newFiles];
+      return newFileList;
+    });
+  };
+
+  const onReset = () => {
+    setSelectedFiles([]);
+    reset();
   };
 
   return (
     <div>
-      <Dialog open={true}>
+      <Dialog
+        onOpenChange={(open) => {
+          if (!open) {
+            onReset();
+          }
+        }}
+      >
         <DialogTrigger asChild>
           <Button variant='outline'>Upload</Button>
         </DialogTrigger>
-        <DialogContent className='sm:max-w-[425px]'>
-          <form onSubmit={handleSubmit(onSubmit)}>
+        <DialogContent className='sm:max-w-7xl overflow-y-auto'>
+          <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
             <DialogHeader>
               <DialogTitle>File Upload</DialogTitle>
               <DialogDescription>
@@ -72,9 +153,7 @@ export default function UploadDialog() {
                 <Input
                   id='description'
                   placeholder='설명을 입력해주세요.(선택)'
-                  {...register('description', {
-                    required: 'Description is required',
-                  })}
+                  {...register('description')}
                 />
                 {errors.description && (
                   <p className='text-red-500 text-sm'>
@@ -85,40 +164,77 @@ export default function UploadDialog() {
               <div className='grid gap-3'>
                 <Label htmlFor='files'>Files</Label>
                 <Input
+                  id='file-input'
+                  hidden={true}
                   type='file'
                   multiple
-                  {...register('files', { required: 'Files are required' })}
+                  {...register('files', {
+                    onChange: handleFileChange,
+                  })}
                 />
+                <Button asChild variant='outline'>
+                  {/* htmlFor 속성으로 input 태그의 id를 연결해줘 파일 선택 버튼을 클릭하면 input 태그가 클릭되도록 함 */}
+                  <label htmlFor='file-input' className='cursor-pointer'>
+                    <Plus className='w-4 h-4 mr-2' />
+                    파일 선택
+                  </label>
+                </Button>
                 {errors.files && (
                   <p className='text-red-500 text-sm'>{errors.files.message}</p>
                 )}
               </div>
               {/* Selected Files */}
-              <Label htmlFor='selected-files'>Selected Files</Label>
-              <ScrollArea className='w-full whitespace-nowrap rounded-md border-2 border-red-500'>
+              <div className='w-full max-w-full overflow-x-auto whitespace-nowrap rounded-md space-y-2 gap-2'>
+                <Label htmlFor='selected-files' className='text-sm'>
+                  Selected Files
+                </Label>
                 {selectedFiles && selectedFiles.length > 0 && (
-                  <div className='flex w-max space-x-4 p-1'>
-                    {Array.from(selectedFiles).map((file) => (
-                      <div key={file.name} className=''>
-                        <SelectedItem
-                          key={file.name}
-                          file={{
-                            ...file,
-                            id: crypto.randomUUID(),
-                            name: file.name,
-                            size: file.size,
-                            type: file.type,
-                            status: 'pending',
-                            preview: URL.createObjectURL(file),
-                          }}
-                          removeFile={removeFile}
-                        />
+                  <>
+                    <ScrollArea>
+                      <div className='flex w-full space-x-4 p-1'>
+                        {Array.from(selectedFiles).map((file) => (
+                          <div key={file.name} className=''>
+                            <FileCard
+                              key={file.name}
+                              file={file}
+                              removeFile={removeFile}
+                            />
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                      <ScrollBar orientation='horizontal' />
+                    </ScrollArea>
+                    <div className='mt-4 text-center'>
+                      <p className='text-xs text-gray-400'>
+                        총 {selectedFiles.length}개의 파일 • 전송완료:{' '}
+                        {selectedFiles.reduce(
+                          (acc, f) => acc + (f.status === 'success' ? 1 : 0),
+                          0
+                        )}
+                        개 • 전송중:{' '}
+                        {selectedFiles.reduce(
+                          (acc, f) => acc + (f.status === 'uploading' ? 1 : 0),
+                          0
+                        )}
+                        개 • 취소:{' '}
+                        {selectedFiles.reduce(
+                          (acc, f) => acc + (f.status === 'canceled' ? 1 : 0),
+                          0
+                        )}
+                        개 • 오류:{' '}
+                        {selectedFiles.reduce(
+                          (acc, f) => acc + (f.status === 'error' ? 1 : 0),
+                          0
+                        )}
+                        개
+                      </p>
+                      <p className='text-xs text-gray-400'>
+                        가로 스크롤로 더 많은 파일을 확인하세요
+                      </p>
+                    </div>
+                  </>
                 )}
-                <ScrollBar orientation='horizontal' />
-              </ScrollArea>
+              </div>
             </div>
             <DialogFooter>
               <DialogClose asChild>

@@ -9,7 +9,7 @@ import { useTranslations } from 'next-intl';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 
-export default function SelectedItem({
+export default function FileCard({
   file,
   removeFile,
 }: {
@@ -18,31 +18,34 @@ export default function SelectedItem({
 }) {
   const t = useTranslations('upload');
   return (
-    <Card key={file.id} className='W-[200px] flex-shrink-0 border-2'>
-      <CardContent id={`selected-item-${file.id}`} className='p-4'>
+    <Card
+      key={file.id}
+      id={`selected-item-card-${file.id}`}
+      className='w-[200px] flex-shrink-0 border-2 p-0'
+    >
+      <CardContent id={`selected-item-card-content-${file.id}`} className='p-4'>
         <div className='space-y-3'>
           {/* 파일 아이콘/미리보기 */}
-          <div className='w-10 h-10 flex-shrink-0'>
+          <div className='relative w-full h-24 rounded-lg'>
             {file.preview ? (
               <Image
                 src={file.preview}
                 alt={file.name}
-                className='w-10 h-10 sm:w-12 sm:h-12 object-cover rounded'
-                width={40}
-                height={40}
+                className='w-full h-10 sm:w-12 sm:h-12 object-cover rounded'
+                fill
               />
             ) : (
-              <div className='h-10 w-10 sm:h-12 sm:w-12 bg-gray-100 rounded flex items-center justify-center'>
+              <div className='h-full w-full rounded flex items-center justify-center'>
                 {getFileIcon(file.type)}
               </div>
             )}
           </div>
 
           {/* 파일 정보 */}
-          <div className='flex-1 min-w-0 overflow-hidden'>
-            <p className='text-xs sm:text-sm font-medium truncate '>
+          <div className='space-y-1'>
+            <h3 className='text-xs sm:text-sm font-medium truncate '>
               {file.name || t('unknown file')}
-            </p>
+            </h3>
             <p className='text-xs text-gray-500'>{formatFileSize(file.size)}</p>
 
             {/* 업로드 진행률 */}
@@ -54,7 +57,7 @@ export default function SelectedItem({
           </div>
 
           {/* 상태 배지 */}
-          <div className='flex items-center gap-2'>
+          <div className='flex items-center justify-between gap-2'>
             {file.status === 'pending' && (
               <Badge variant='secondary' className='text-xs rounded-full'>
                 {t('pending')}
