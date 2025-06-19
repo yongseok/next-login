@@ -16,7 +16,7 @@ import { Upload } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import FileCard from './components/FileCard';
+import FileListItem from './components/FileListItem';
 
 type FormData = {
   title: string;
@@ -246,7 +246,7 @@ export default function UploadPage() {
                 </h3>
                 <div className='space-y-2 sm:space-y-3'>
                   {files.map((file) => (
-                    <FileCard
+                    <FileListItem
                       key={file.id}
                       file={file}
                       removeFile={removeFile}
