@@ -1,5 +1,5 @@
 {
-  "commentTranslate.hover.enabled": false,
+  "commentTranslate.hover.enabled": true,
   "postman.settings.dotenv-detection-notification-visibility": false,
   "i18n-ally.localesPaths": ["messages", "src/i18n"],
   "i18n-ally.sourceLanguage": "ko",

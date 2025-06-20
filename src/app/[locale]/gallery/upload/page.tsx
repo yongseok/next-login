@@ -60,14 +60,9 @@ export default function UploadPage() {
             ) {
               return acc;
             } else {
-              const fileWithPreview: FileWithPreview = {
-                ...file,
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                id: crypto.randomUUID(),
-                status: 'pending',
-              };
+              const fileWithPreview = file as FileWithPreview;
+              fileWithPreview.id = crypto.randomUUID();
+              fileWithPreview.status = 'pending';
               // 이미지 파일인 경우 미리보기 생성
               if (file.type.startsWith('image/')) {
                 fileWithPreview.preview = URL.createObjectURL(file);
@@ -162,6 +157,19 @@ export default function UploadPage() {
     });
   };
 
+  const uploadFile = async (file: FileWithPreview) => {
+    const formData = new FormData();
+    formData.append('file', file as Blob, file.name);
+
+    const response = await fetch('/api/gallery/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    if (!response.ok) {
+      throw new Error('Failed to upload files');
+    }
+  };
+
   const onSubmit = async (data: FormData) => {
     if (files.length === 0) {
       alert(t('noFilesSelected'));
@@ -171,7 +179,7 @@ export default function UploadPage() {
     setIsUploading(true);
     try {
       console.log('🚀 | onSubmit | data:', data);
-      await Promise.all(files.map(simulateUpload));
+      await Promise.all(files.map(uploadFile));
       toast.success(t('uploadSuccess'));
     } catch (error) {
       console.error('[UploadPage][onSubmit]', error);

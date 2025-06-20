@@ -1,9 +1,7 @@
-import { NextRequest } from 'next/server';
 import path from 'path';
 import fs from 'fs';
-import { glob } from 'glob';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const filePath = path.join(process.cwd(), 'public/globe.svg');
   const file = fs.readFileSync(filePath, 'utf8');
   await new Promise((resolve) => setTimeout(resolve, 1000));
