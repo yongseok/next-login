@@ -19,6 +19,7 @@ import { useForm } from 'react-hook-form';
 import FileListItem from './components/FileListItem';
 import { toast } from 'sonner';
 import axios from 'axios';
+import { useFileHandler } from '@/lib/hooks/useFileHandler';
 
 type FormData = {
   title: string;
@@ -28,7 +29,6 @@ type FormData = {
 
 export default function UploadPage() {
   const t = useTranslations('upload');
-  const [files, setFiles] = useState<FileWithPreview[]>([]);
 
   const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -46,46 +46,8 @@ export default function UploadPage() {
     },
   });
 
-  const processFiles = useCallback(
-    (fileList: FileList) => {
-      setFiles((prev) => {
-        const newFiles: FileWithPreview[] = Array.from(fileList).reduce(
-          (acc: FileWithPreview[], file) => {
-            if (
-              prev.some(
-                (f) =>
-                  f.file.name === file.name &&
-                  f.file.size === file.size &&
-                  f.file.type === file.type
-              )
-            ) {
-              return acc;
-            } else {
-              const fileWithPreview: FileWithPreview = {
-                file: file,
-                id: crypto.randomUUID(),
-                status: 'pending',
-              };
-
-              // 이미지 파일인 경우 미리보기 생성
-              if (file.type.startsWith('image/')) {
-                fileWithPreview.preview = URL.createObjectURL(file);
-              }
-              return [...acc, fileWithPreview];
-            }
-          },
-          []
-        );
-        const updatedFiles = [...prev, ...newFiles];
-        setValue(
-          'files',
-          updatedFiles.map((f) => f.file)
-        );
-        return updatedFiles;
-      });
-    },
-    [setValue]
-  );
+  const { files, setFiles, processFiles, removeFile, resetFiles } =
+    useFileHandler(setValue);
 
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
@@ -119,53 +81,6 @@ export default function UploadPage() {
     },
     [processFiles]
   );
-
-  const removeFile = useCallback(
-    (fileId: string) => {
-      setFiles((prev) => {
-        const updatedFiles = prev.filter((file) => file.id !== fileId);
-        setValue(
-          'files',
-          updatedFiles.map((f) => f.file)
-        );
-        return updatedFiles;
-      });
-    },
-    [setValue]
-  );
-
-  // const simulateUpload = async (file: FileWithPreview): Promise<void> => {
-  //   return new Promise<void>((resolve, reject) => {
-  //     let progress = 0;
-  //     const interval = setInterval(() => {
-  //       try {
-  //         progress += Math.random() * 30;
-  //         if (progress >= 100) {
-  //           progress = 100;
-  //           clearInterval(interval);
-  //           setFiles((prev) =>
-  //             prev.map((f) =>
-  //               f.id === file.id ? { ...f, status: 'success' } : f
-  //             )
-  //           );
-  //           resolve();
-  //         } else {
-  //           setFiles((prev) =>
-  //             prev.map((f) =>
-  //               f.id === file.id ? { ...f, progress, status: 'uploading' } : f
-  //             )
-  //           );
-  //         }
-  //       } catch (error) {
-  //         clearInterval(interval);
-  //         setFiles((prev) =>
-  //           prev.map((f) => (f.id === file.id ? { ...f, status: 'error' } : f))
-  //         );
-  //         reject(error);
-  //       }
-  //     }, 200);
-  //   });
-  // };
 
   const uploadFile = async (fileWithPreview: FileWithPreview) => {
     const formData = new FormData();
@@ -331,7 +246,7 @@ export default function UploadPage() {
               <Button
                 type='button'
                 variant='outline'
-                onClick={() => setFiles([])}
+                onClick={resetFiles}
                 disabled={isUploading}
               >
                 {t('cancel')}

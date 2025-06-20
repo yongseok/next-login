@@ -8,8 +8,9 @@ import { Card } from '@/components/ui/card';
 import { useTranslations } from 'next-intl';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import { memo } from 'react';
 
-export default function FileListItem({
+function FileListItem({
   file,
   removeFile,
 }: {
@@ -92,3 +93,5 @@ export default function FileListItem({
     </Card>
   );
 }
+
+export default memo(FileListItem);
