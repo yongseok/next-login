@@ -17,6 +17,7 @@ import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import FileListItem from './components/FileListItem';
+import { toast } from 'sonner';
 
 type FormData = {
   title: string;
@@ -128,44 +129,56 @@ export default function UploadPage() {
     [setValue]
   );
 
-  const simulateUpload = async (file: FileWithPreview) => {
-    return new Promise<void>((resolve) => {
+  const simulateUpload = async (file: FileWithPreview): Promise<void> => {
+    return new Promise<void>((resolve, reject) => {
       let progress = 0;
       const interval = setInterval(() => {
-        progress += Math.random() * 30;
-        if (progress >= 100) {
-          progress = 100;
+        try {
+          progress += Math.random() * 30;
+          if (progress >= 100) {
+            progress = 100;
+            clearInterval(interval);
+            setFiles((prev) =>
+              prev.map((f) =>
+                f.id === file.id ? { ...f, status: 'success' } : f
+              )
+            );
+            resolve();
+          } else {
+            setFiles((prev) =>
+              prev.map((f) =>
+                f.id === file.id ? { ...f, progress, status: 'uploading' } : f
+              )
+            );
+          }
+        } catch (error) {
           clearInterval(interval);
           setFiles((prev) =>
-            prev.map((f) =>
-              f.id === file.id ? { ...f, status: 'success' } : f
-            )
+            prev.map((f) => (f.id === file.id ? { ...f, status: 'error' } : f))
           );
-          resolve();
-        } else {
-          setFiles((prev) =>
-            prev.map((f) =>
-              f.id === file.id ? { ...f, progress, status: 'uploading' } : f
-            )
-          );
+          reject(error);
         }
       }, 200);
     });
   };
 
   const onSubmit = async (data: FormData) => {
-    console.log('🚀 | onSubmit | data:', data);
     if (files.length === 0) {
       alert(t('noFilesSelected'));
       return;
     }
 
     setIsUploading(true);
-    await Promise.all(files.map(simulateUpload));
-    setIsUploading(false);
-    alert(t('uploadSuccess'));
-    console.log('Form data:', data);
-    console.log('Files:', files);
+    try {
+      console.log('🚀 | onSubmit | data:', data);
+      await Promise.all(files.map(simulateUpload));
+      toast.success(t('uploadSuccess'));
+    } catch (error) {
+      console.error('[UploadPage][onSubmit]', error);
+      toast.error(t('uploadError'));
+    } finally {
+      setIsUploading(false);
+    }
   };
   return (
     <div className='w-full max-w-7xl mx-auto p-4 sm:p-6'>
@@ -181,6 +194,7 @@ export default function UploadPage() {
               <Label htmlFor='title'>{t('titlelabel')}</Label>
               <Input
                 id='title'
+                disabled={isUploading}
                 placeholder={t('titlePlaceholder')}
                 {...register('title', { required: t('titleRequired') })}
               />
@@ -191,6 +205,7 @@ export default function UploadPage() {
                 <Label htmlFor='description'>{t('descriptionlabel')}</Label>
                 <Input
                   id='description'
+                  disabled={isUploading}
                   placeholder={t('descriptionPlaceholder')}
                   {...register('description')}
                 />
@@ -201,41 +216,53 @@ export default function UploadPage() {
             </div>
 
             {/* 파일 드롭 영역 */}
-            <div
-              className={cn(
-                'border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-colors',
-                isDragOver
-                  ? 'border-primary bg-primary/5'
-                  : 'border-gray-300 hover:border-gray-400'
-              )}
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-              onDragLeave={handleDragLeave}
-            >
-              <Upload className='mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mb-3 sm:mb-4' />
-              <div className='space-y-2'>
-                <p className='text-base sm:text-lg font-medium'>
-                  {t('dragAndDrop')}
-                </p>
-                <p className='text-xs sm:text-sm text-gray-500'>
-                  {t('supportedFormats')}
-                </p>
-              </div>
-              <Input
-                type='file'
-                multiple
-                onChange={handleFileInput}
-                className='hidden'
-                id='file-input'
-                accept='*/*'
-              />
-              <Button
-                type='button'
-                className='mt-3 sm:mt-4 w-full sm:w-auto hover:cursor-pointer'
-                onClick={() => document.getElementById('file-input')?.click()}
+            <div className='relative'>
+              <div
+                className={cn(
+                  'border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-colors',
+                  isDragOver
+                    ? 'border-primary bg-primary/5'
+                    : 'border-gray-300 hover:border-gray-400'
+                )}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
               >
-                파일 선택
-              </Button>
+                <Upload className='mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mb-3 sm:mb-4' />
+                <div className='space-y-2'>
+                  <p className='text-base sm:text-lg font-medium'>
+                    {t('dragAndDrop')}
+                  </p>
+                  <p className='text-xs sm:text-sm text-gray-500'>
+                    {t('supportedFormats')}
+                  </p>
+                </div>
+                <Input
+                  type='file'
+                  multiple
+                  onChange={handleFileInput}
+                  className='hidden'
+                  id='file-input'
+                  accept='*/*'
+                />
+                <Button
+                  type='button'
+                  className='mt-3 sm:mt-4 w-full sm:w-auto hover:cursor-pointer'
+                  onClick={() => document.getElementById('file-input')?.click()}
+                >
+                  파일 선택
+                </Button>
+              </div>
+              {isUploading && (
+                <div
+                  className='absolute inset-0 z-10 cursor-not-allowed'
+                  style={{
+                    background: 'rgba(255,255,255,0.5)',
+                    pointerEvents: 'all',
+                  }}
+                  aria-label='업로드 중에는 드래그 앤 드롭이 비활성화됩니다.'
+                ></div>
+              )}
             </div>
 
             {/* 선택된 파일 목록 */}
@@ -261,6 +288,7 @@ export default function UploadPage() {
                 type='button'
                 variant='outline'
                 onClick={() => setFiles([])}
+                disabled={isUploading}
               >
                 {t('cancel')}
               </Button>

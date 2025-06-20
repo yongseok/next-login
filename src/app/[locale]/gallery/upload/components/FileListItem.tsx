@@ -17,6 +17,7 @@ export default function FileListItem({
   removeFile: (id: string) => void;
 }) {
   const t = useTranslations('upload');
+
   return (
     <Card className='p-3 sm:p-4' id={`file-list-item-${file.id}`}>
       <div className='flex items-center gap-3 sm:gap-4'>
@@ -31,7 +32,7 @@ export default function FileListItem({
               height={40}
             />
           ) : (
-            <div className='h-10 w-10 sm:h-12 sm:w-12 bg-gray-100 rounded flex items-center justify-center'>
+            <div className='h-10 w-10 sm:h-12 sm:w-12 rounded flex items-center justify-center'>
               {getFileIcon(file.type)}
             </div>
           )}
