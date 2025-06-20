@@ -18,6 +18,7 @@ import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import FileListItem from './components/FileListItem';
 import { toast } from 'sonner';
+import axios from 'axios';
 
 type FormData = {
   title: string;
@@ -53,16 +54,19 @@ export default function UploadPage() {
             if (
               prev.some(
                 (f) =>
-                  f.name === file.name &&
-                  f.size === file.size &&
-                  f.type === file.type
+                  f.file.name === file.name &&
+                  f.file.size === file.size &&
+                  f.file.type === file.type
               )
             ) {
               return acc;
             } else {
-              const fileWithPreview = file as FileWithPreview;
-              fileWithPreview.id = crypto.randomUUID();
-              fileWithPreview.status = 'pending';
+              const fileWithPreview: FileWithPreview = {
+                file: file,
+                id: crypto.randomUUID(),
+                status: 'pending',
+              };
+
               // 이미지 파일인 경우 미리보기 생성
               if (file.type.startsWith('image/')) {
                 fileWithPreview.preview = URL.createObjectURL(file);
@@ -73,7 +77,10 @@ export default function UploadPage() {
           []
         );
         const updatedFiles = [...prev, ...newFiles];
-        setValue('files', updatedFiles);
+        setValue(
+          'files',
+          updatedFiles.map((f) => f.file)
+        );
         return updatedFiles;
       });
     },
@@ -117,56 +124,85 @@ export default function UploadPage() {
     (fileId: string) => {
       setFiles((prev) => {
         const updatedFiles = prev.filter((file) => file.id !== fileId);
-        setValue('files', updatedFiles);
+        setValue(
+          'files',
+          updatedFiles.map((f) => f.file)
+        );
         return updatedFiles;
       });
     },
     [setValue]
   );
 
-  const simulateUpload = async (file: FileWithPreview): Promise<void> => {
-    return new Promise<void>((resolve, reject) => {
-      let progress = 0;
-      const interval = setInterval(() => {
-        try {
-          progress += Math.random() * 30;
+  // const simulateUpload = async (file: FileWithPreview): Promise<void> => {
+  //   return new Promise<void>((resolve, reject) => {
+  //     let progress = 0;
+  //     const interval = setInterval(() => {
+  //       try {
+  //         progress += Math.random() * 30;
+  //         if (progress >= 100) {
+  //           progress = 100;
+  //           clearInterval(interval);
+  //           setFiles((prev) =>
+  //             prev.map((f) =>
+  //               f.id === file.id ? { ...f, status: 'success' } : f
+  //             )
+  //           );
+  //           resolve();
+  //         } else {
+  //           setFiles((prev) =>
+  //             prev.map((f) =>
+  //               f.id === file.id ? { ...f, progress, status: 'uploading' } : f
+  //             )
+  //           );
+  //         }
+  //       } catch (error) {
+  //         clearInterval(interval);
+  //         setFiles((prev) =>
+  //           prev.map((f) => (f.id === file.id ? { ...f, status: 'error' } : f))
+  //         );
+  //         reject(error);
+  //       }
+  //     }, 200);
+  //   });
+  // };
+
+  const uploadFile = async (fileWithPreview: FileWithPreview) => {
+    const formData = new FormData();
+    formData.append('file', fileWithPreview.file, fileWithPreview.file.name);
+
+    try {
+      const response = await axios.post('/api/gallery/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+          const progress = Math.round(
+            (progressEvent.loaded * 100) / (progressEvent.total || 1)
+          );
           if (progress >= 100) {
-            progress = 100;
-            clearInterval(interval);
             setFiles((prev) =>
               prev.map((f) =>
-                f.id === file.id ? { ...f, status: 'success' } : f
+                f.id === fileWithPreview.id
+                  ? { ...f, status: 'success', progress: 100 }
+                  : f
               )
             );
-            resolve();
           } else {
             setFiles((prev) =>
               prev.map((f) =>
-                f.id === file.id ? { ...f, progress, status: 'uploading' } : f
+                f.id === fileWithPreview.id
+                  ? { ...f, progress, status: 'uploading' }
+                  : f
               )
             );
           }
-        } catch (error) {
-          clearInterval(interval);
-          setFiles((prev) =>
-            prev.map((f) => (f.id === file.id ? { ...f, status: 'error' } : f))
-          );
-          reject(error);
-        }
-      }, 200);
-    });
-  };
-
-  const uploadFile = async (file: FileWithPreview) => {
-    const formData = new FormData();
-    formData.append('file', file as Blob, file.name);
-
-    const response = await fetch('/api/gallery/upload', {
-      method: 'POST',
-      body: formData,
-    });
-    if (!response.ok) {
-      throw new Error('Failed to upload files');
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('🚀 | uploadFile | error:', fileWithPreview.file.name);
+      throw error;
     }
   };
 

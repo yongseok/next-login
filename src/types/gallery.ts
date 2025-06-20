@@ -35,12 +35,20 @@ export type GalleryProps = {
 };
 
 // upload page
-export interface FileWithPreview extends File {
+// export interface FileWithPreview extends File {
+//   id: string;
+//   name: string;
+//   size: number;
+//   type: string;
+//   preview?: string;
+//   progress?: number;
+//   status?: 'pending' | 'uploading' | 'success' | 'canceled' | 'error';
+// }
+
+export type FileWithPreview = {
+  file: File;
   id: string;
-  name: string;
-  size: number;
-  type: string;
   preview?: string;
   progress?: number;
   status?: 'pending' | 'uploading' | 'success' | 'canceled' | 'error';
-}
+};

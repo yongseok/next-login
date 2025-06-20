@@ -26,14 +26,14 @@ export default function FileListItem({
           {file.preview ? (
             <Image
               src={file.preview}
-              alt={file.name}
+              alt={file.file.name}
               className='w-10 h-10 sm:w-12 sm:h-12 object-cover rounded'
               width={40}
               height={40}
             />
           ) : (
             <div className='h-10 w-10 sm:h-12 sm:w-12 rounded flex items-center justify-center'>
-              {getFileIcon(file.type)}
+              {getFileIcon(file.file.type)}
             </div>
           )}
         </div>
@@ -41,9 +41,11 @@ export default function FileListItem({
         {/* 파일 정보 */}
         <div className='flex-1 min-w-0 overflow-hidden'>
           <p className='text-xs sm:text-sm font-medium '>
-            {file.name || t('unknown file')}
+            {file.file.name || t('unknown file')}
           </p>
-          <p className='text-xs text-gray-500'>{formatFileSize(file.size)}</p>
+          <p className='text-xs text-gray-500'>
+            {formatFileSize(file.file.size)}
+          </p>
 
           {/* 업로드 진행률 */}
           {file.status === 'uploading' && file.progress !== undefined && (
