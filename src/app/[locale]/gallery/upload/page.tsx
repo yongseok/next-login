@@ -20,19 +20,23 @@ import FileListItem from './components/FileListItem';
 import { toast } from 'sonner';
 import axios from 'axios';
 import { useFileHandler } from '@/lib/hooks/useFileHandler';
+import useSWRMutation from 'swr/mutation';
 
 type FormData = {
   title: string;
   description: string;
   files: File[];
 };
-
+/*
+ * 기능 구현 예정
+ * [ ] swr 통합
+ * [ ] 취소, 재전송
+ * [ ] 갤러리 데이터 저장
+ *   - [ ] 임시 저장 파일 삭제 처리(https://grok.com/share/bGVnYWN5_0a3cf627-aac4-4090-9c50-8eff75690b2f)
+ */
 export default function UploadPage() {
   const t = useTranslations('upload');
-
-  const [isUploading, setIsUploading] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-
   const {
     register,
     handleSubmit,
@@ -45,8 +49,11 @@ export default function UploadPage() {
       files: [],
     },
   });
-
-  const { files, setFiles, processFiles, removeFile, resetFiles } =
+  const { trigger, isMutating } = useSWRMutation(
+    '/api/gallery/upload',
+    uploadFile
+  );
+  const { files, insertFiles, removeFile, resetFiles, updateFile } =
     useFileHandler(setValue);
 
   const handleDrop = useCallback(
@@ -56,10 +63,18 @@ export default function UploadPage() {
 
       const droppedFiles = e.dataTransfer.files;
       if (droppedFiles.length > 0) {
-        processFiles(droppedFiles);
+        insertFiles(droppedFiles, (newFiles) => {
+          newFiles.forEach((file) => {
+            trigger(file, {
+              onError: () => {
+                updateFile(file.id, { status: 'error' });
+              },
+            });
+          });
+        });
       }
     },
-    [processFiles]
+    [insertFiles, trigger, updateFile]
   );
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -76,18 +91,29 @@ export default function UploadPage() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const selectedFiles = e.target.files;
       if (selectedFiles && selectedFiles.length > 0) {
-        processFiles(selectedFiles);
+        insertFiles(selectedFiles, (newFiles) => {
+          newFiles.forEach((file) => {
+            trigger(file, {
+              onError: () => {
+                updateFile(file.id, { status: 'error' });
+              },
+            });
+          });
+        });
       }
     },
-    [processFiles]
+    [insertFiles, trigger, updateFile]
   );
 
-  const uploadFile = async (fileWithPreview: FileWithPreview) => {
+  async function uploadFile(
+    url: string,
+    { arg: fileWithPreview }: { arg: FileWithPreview }
+  ) {
     const formData = new FormData();
     formData.append('file', fileWithPreview.file, fileWithPreview.file.name);
 
     try {
-      const response = await axios.post('/api/gallery/upload', formData, {
+      const response = await axios.post(url, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -96,21 +122,15 @@ export default function UploadPage() {
             (progressEvent.loaded * 100) / (progressEvent.total || 1)
           );
           if (progress >= 100) {
-            setFiles((prev) =>
-              prev.map((f) =>
-                f.id === fileWithPreview.id
-                  ? { ...f, status: 'success', progress: 100 }
-                  : f
-              )
-            );
+            updateFile(fileWithPreview.id, {
+              status: 'success',
+              progress: 100,
+            });
           } else {
-            setFiles((prev) =>
-              prev.map((f) =>
-                f.id === fileWithPreview.id
-                  ? { ...f, progress, status: 'uploading' }
-                  : f
-              )
-            );
+            updateFile(fileWithPreview.id, {
+              progress,
+              status: 'uploading',
+            });
           }
         },
       });
@@ -119,25 +139,35 @@ export default function UploadPage() {
       console.error('🚀 | uploadFile | error:', fileWithPreview.file.name);
       throw error;
     }
-  };
+  }
 
   const onSubmit = async (data: FormData) => {
-    if (files.length === 0) {
-      alert(t('noFilesSelected'));
+    const isStillUploading = files.some((file) => file.status === 'uploading');
+    if (isStillUploading) {
+      toast.error(
+        '아직 업로드 중인 파일이 있습니다. 잠시 후 다시 시도해주세요.'
+      );
       return;
     }
 
-    setIsUploading(true);
-    try {
-      console.log('🚀 | onSubmit | data:', data);
-      await Promise.all(files.map(uploadFile));
-      toast.success(t('uploadSuccess'));
-    } catch (error) {
-      console.error('[UploadPage][onSubmit]', error);
-      toast.error(t('uploadError'));
-    } finally {
-      setIsUploading(false);
+    const successfulUploads = files.filter((file) => file.status === 'success');
+    if (successfulUploads.length === 0) {
+      toast.error('업로드된 파일이 없습니다.');
+      return;
     }
+
+    if (files.some((file) => file.status === 'error')) {
+      toast.error('오류가 발생한 파일이 있습니다. 확인 후 다시 시도해주세요.');
+      return;
+    }
+
+    // TODO: 갤러리 생성 API 호출
+    // data.title, data.description, successfulUploads 정보를 사용
+    console.log('Creating gallery with:', {
+      ...data,
+      files: successfulUploads,
+    });
+    toast.success('갤러리 정보를 성공적으로 제출했습니다. (콘솔 로그 확인)');
   };
   return (
     <div className='w-full max-w-7xl mx-auto p-4 sm:p-6'>
@@ -153,7 +183,7 @@ export default function UploadPage() {
               <Label htmlFor='title'>{t('titlelabel')}</Label>
               <Input
                 id='title'
-                disabled={isUploading}
+                disabled={isMutating}
                 placeholder={t('titlePlaceholder')}
                 {...register('title', { required: t('titleRequired') })}
               />
@@ -164,7 +194,7 @@ export default function UploadPage() {
                 <Label htmlFor='description'>{t('descriptionlabel')}</Label>
                 <Input
                   id='description'
-                  disabled={isUploading}
+                  disabled={isMutating}
                   placeholder={t('descriptionPlaceholder')}
                   {...register('description')}
                 />
@@ -212,7 +242,7 @@ export default function UploadPage() {
                   파일 선택
                 </Button>
               </div>
-              {isUploading && (
+              {isMutating && (
                 <div
                   className='absolute inset-0 z-10 cursor-not-allowed'
                   style={{
@@ -247,12 +277,12 @@ export default function UploadPage() {
                 type='button'
                 variant='outline'
                 onClick={resetFiles}
-                disabled={isUploading}
+                disabled={isMutating}
               >
                 {t('cancel')}
               </Button>
-              <Button type='submit' disabled={isUploading}>
-                {isUploading
+              <Button type='submit' disabled={isMutating}>
+                {isMutating
                   ? t('uploading')
                   : t('submit', { count: files.length })}
               </Button>

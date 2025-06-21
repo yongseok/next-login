@@ -13,43 +13,62 @@ type FormData = {
 export const useFileHandler = (setValue: UseFormSetValue<FormData>) => {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
 
-  // 파일 목록에 추가
-  const processFiles = useCallback(
-    (fileList: FileList) => {
-      setFiles((prev) => {
-        const newFiles: FileWithPreview[] = Array.from(fileList).reduce(
-          (acc: FileWithPreview[], file) => {
-            // 중복 파일 체크
-            if (
-              prev.some(
-                (f) =>
-                  f.file.name === file.name &&
-                  f.file.size === file.size &&
-                  f.file.type === file.type
-              )
-            ) {
-              return acc;
-            } else {
-              const fileWithPreview: FileWithPreview = {
-                file: file,
-                id: crypto.randomUUID(),
-                status: 'pending',
-              };
+  const updateFile = useCallback(
+    (
+      fileId: string,
+      newProps: Partial<Omit<FileWithPreview, 'id' | 'file' | 'preview'>>
+    ) => {
+      setFiles((prev) =>
+        prev.map((f) => (f.id === fileId ? { ...f, ...newProps } : f))
+      );
+    },
+    []
+  );
 
-              // 이미지 파일인 경우 미리보기 생성
-              if (file.type.startsWith('image/')) {
-                fileWithPreview.preview = URL.createObjectURL(file);
-              }
-              return [...acc, fileWithPreview];
-            }
-          },
-          []
+  // 파일 목록에 추가하고, 추가된 파일 목록을 콜백으로 반환합니다.
+  const insertFiles = useCallback(
+    (
+      fileList: FileList,
+      onFilesInserted: (newFiles: FileWithPreview[]) => void
+    ) => {
+      setFiles((prevFiles) => {
+        const uniqueIncomingFiles = Array.from(fileList).filter(
+          (incomingFile) =>
+            !prevFiles.some(
+              (prevFile) =>
+                prevFile.file.name === incomingFile.name &&
+                prevFile.file.size === incomingFile.size &&
+                prevFile.file.type === incomingFile.type
+            )
         );
-        const updatedFiles = [...prev, ...newFiles];
+
+        if (uniqueIncomingFiles.length === 0) {
+          onFilesInserted([]);
+          return prevFiles;
+        }
+
+        const newFilesWithPreview: FileWithPreview[] = uniqueIncomingFiles.map(
+          (file) => {
+            const fileWithPreview: FileWithPreview = {
+              file,
+              id: crypto.randomUUID(),
+              status: 'pending',
+            };
+            if (file.type.startsWith('image/')) {
+              fileWithPreview.preview = URL.createObjectURL(file);
+            }
+            return fileWithPreview;
+          }
+        );
+
+        const updatedFiles = [...prevFiles, ...newFilesWithPreview];
         setValue(
           'files',
           updatedFiles.map((f) => f.file)
         );
+
+        onFilesInserted(newFilesWithPreview);
+
         return updatedFiles;
       });
     },
@@ -77,5 +96,5 @@ export const useFileHandler = (setValue: UseFormSetValue<FormData>) => {
     setValue('files', []);
   }, [setValue]);
 
-  return { files, setFiles, processFiles, removeFile, resetFiles };
+  return { files, insertFiles, removeFile, resetFiles, updateFile };
 };
