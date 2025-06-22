@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: 'File uploaded successfully',
       filename,
-      url: `/uploads/${filename}`,
+      url: `${process.env.UPLOAD_PATH}/${filename}`,
     });
   } catch (error) {
     console.error('🚀 | POST | error:', error);
