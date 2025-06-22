@@ -96,6 +96,7 @@
     "pending": "In the atmosphere",
     "success": "complete",
     "titlelabel": "title",
-    "uploading": "Uploading"
+    "uploading": "Uploading",
+    "canceled": "Canceled"
   }
 }
