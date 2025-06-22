@@ -30,12 +30,9 @@ export const useFileHandler = (setValue: UseFormSetValue<FormData>) => {
     []
   );
 
-  // 파일 목록에 추가하고, 추가된 파일 목록을 콜백으로 반환합니다.
+  // 파일 목록에 추가
   const insertFiles = useCallback(
-    (
-      fileList: FileList,
-      onFilesInserted: (newFiles: FileWithPreview[]) => void
-    ) => {
+    (fileList: FileList) => {
       setFiles((prevFiles) => {
         const uniqueIncomingFiles = Array.from(fileList).filter(
           (incomingFile) =>
@@ -48,7 +45,6 @@ export const useFileHandler = (setValue: UseFormSetValue<FormData>) => {
         );
 
         if (uniqueIncomingFiles.length === 0) {
-          onFilesInserted([]);
           return prevFiles;
         }
 
@@ -71,8 +67,6 @@ export const useFileHandler = (setValue: UseFormSetValue<FormData>) => {
           'files',
           updatedFiles.map((f) => f.file)
         );
-
-        onFilesInserted(newFilesWithPreview);
 
         return updatedFiles;
       });

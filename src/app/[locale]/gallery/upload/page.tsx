@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { Upload } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import FileListItem from './components/FileListItem';
 import { toast } from 'sonner';
@@ -51,7 +51,33 @@ export default function UploadPage() {
   const { files, insertFiles, removeFile, resetFiles, updateFile } =
     useFileHandler(setValue);
 
-  const { trigger, isMutating } = useFileUpload(updateFile);
+  const { trigger, isMutating, abort } = useFileUpload(updateFile);
+
+  /**
+   * 파일 업로드 부수 효과(side effect) 처리.
+   *
+   * 이 `useEffect`는 `files` 상태가 변경될 때마다 실행되어,
+   * 'pending' 상태인 파일들을 찾아 업로드를 시작합니다.
+   *
+   * @reason 역할 분리 및 선언적 프로그래밍
+   * `useFileHandler`의 `insertFiles` 함수에서 `onFilesInserted` 콜백을 제거하고,
+   * 이제 순수하게 파일 목록 '상태를 변경하는' 책임만 담당하도록 수정했습니다.
+   *
+   * 실제 업로드 로직(부수 효과)은 이 `useEffect`가 전담하여 처리합니다.
+   * 이렇게 상태 관리 로직과 부수 효과 로직을 명확히 분리함으로써,
+   * React의 StrictMode에서 발생하는 중복 실행 문제를 해결하고
+   * 상태 동기화의 복잡성을 피해 코드를 더 견고하고 예측 가능하게 만듭니다.
+   */
+  useEffect(() => {
+    const filesToUpload = files.filter((file) => file.status === 'pending');
+    if (filesToUpload.length > 0) {
+      filesToUpload.forEach((file) => {
+        // 중복 실행을 막기 위해 상태를 즉시 변경하고 업로드를 트리거합니다.
+        updateFile(file.id, { status: 'uploading', progress: 0 });
+        trigger(file);
+      });
+    }
+  }, [files, trigger, updateFile]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
@@ -60,18 +86,10 @@ export default function UploadPage() {
 
       const droppedFiles = e.dataTransfer.files;
       if (droppedFiles.length > 0) {
-        insertFiles(droppedFiles, (newFiles) => {
-          newFiles.forEach((file) => {
-            trigger(file, {
-              onError: () => {
-                updateFile(file.id, { status: 'error' });
-              },
-            });
-          });
-        });
+        insertFiles(droppedFiles);
       }
     },
-    [insertFiles, trigger, updateFile]
+    [insertFiles]
   );
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -88,18 +106,10 @@ export default function UploadPage() {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const selectedFiles = e.target.files;
       if (selectedFiles && selectedFiles.length > 0) {
-        insertFiles(selectedFiles, (newFiles) => {
-          newFiles.forEach((file) => {
-            trigger(file, {
-              onError: () => {
-                updateFile(file.id, { status: 'error' });
-              },
-            });
-          });
-        });
+        insertFiles(selectedFiles);
       }
     },
-    [insertFiles, trigger, updateFile]
+    [insertFiles]
   );
 
   const onSubmit = async (data: FormData) => {
@@ -227,6 +237,8 @@ export default function UploadPage() {
                       key={file.id}
                       file={file}
                       removeFile={removeFile}
+                      abort={abort}
+                      updateFile={updateFile}
                     />
                   ))}
                 </div>

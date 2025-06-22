@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { Ban, RefreshCcw, X } from 'lucide-react';
 import Image from 'next/image';
 import { getFileIcon } from '@/lib/utils/getFileIcons';
 import { formatFileSize } from '@/lib/utils/formatFileSize';
@@ -13,14 +13,18 @@ import { memo } from 'react';
 function FileListItem({
   file,
   removeFile,
+  abort,
+  updateFile,
 }: {
   file: FileWithPreview;
   removeFile: (id: string) => void;
+  abort: (id: string) => void;
+  updateFile: (id: string, file: Partial<FileWithPreview>) => void;
 }) {
   const t = useTranslations('upload');
 
   return (
-    <Card className='p-3 sm:p-4' id={`file-list-item-${file.id}`}>
+    <Card className='p-3 sm:p-4 group' id={`file-list-item-${file.id}`}>
       <div className='flex items-center gap-3 sm:gap-4'>
         {/* 파일 아이콘/미리보기 */}
         <div className='w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0'>
@@ -75,6 +79,37 @@ function FileListItem({
             >
               {t('success')}
             </Badge>
+          )}
+          {file.status === 'canceled' && (
+            <div className='flex items-center gap-2'>
+              <Badge
+                variant='destructive'
+                className='group-hover:hidden text-xs rounded-full'
+              >
+                {t('canceled')}
+              </Badge>
+              <Button
+                type='button'
+                variant='ghost'
+                size='sm'
+                className='hidden group-hover:block h-8 w-8 p-0 hover:cursor-pointer'
+                onClick={() => updateFile(file.id, { status: 'pending' })}
+              >
+                <RefreshCcw className='w-4 h-4' />
+              </Button>
+            </div>
+          )}
+
+          {file.status === 'uploading' && (
+            <Button
+              type='button'
+              variant='ghost'
+              size='sm'
+              className='h-8 w-8 p-0'
+              onClick={() => abort(file.id)}
+            >
+              <Ban />
+            </Button>
           )}
 
           {/* 삭제 버튼 */}

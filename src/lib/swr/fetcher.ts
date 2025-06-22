@@ -18,6 +18,7 @@ export const getUserByEmail = async (url: string) => {
 export const uploadFileWithPreview = async (
   url: string,
   data: FileWithPreview,
+  signal: AbortSignal | undefined,
   onUploadProgress: (progress: number) => void
 ) => {
   const response = await axios.post(url, data, {
@@ -30,6 +31,7 @@ export const uploadFileWithPreview = async (
       );
       onUploadProgress(progress);
     },
+    signal,
   });
   return response.data;
 };
