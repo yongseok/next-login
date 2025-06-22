@@ -10,6 +10,11 @@ type FormData = {
   files: File[];
 };
 
+/**
+ * 파일 전송 상태 관리 훅
+ * @param setValue 폼 값 설정 함수
+ * @returns 파일 전송 상태 관리 함수
+ */
 export const useFileHandler = (setValue: UseFormSetValue<FormData>) => {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
 

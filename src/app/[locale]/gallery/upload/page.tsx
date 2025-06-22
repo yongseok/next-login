@@ -11,16 +11,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { FileWithPreview } from '@/types/gallery';
 import { Upload } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import FileListItem from './components/FileListItem';
 import { toast } from 'sonner';
-import axios from 'axios';
 import { useFileHandler } from '@/lib/hooks/useFileHandler';
-import useSWRMutation from 'swr/mutation';
+import { useFileUpload } from '@/lib/swr/useFile';
 
 type FormData = {
   title: string;
@@ -29,7 +27,7 @@ type FormData = {
 };
 /*
  * 기능 구현 예정
- * [ ] swr 통합
+ * [x] swr 통합
  * [ ] 취소, 재전송
  * [ ] 갤러리 데이터 저장
  *   - [ ] 임시 저장 파일 삭제 처리(https://grok.com/share/bGVnYWN5_0a3cf627-aac4-4090-9c50-8eff75690b2f)
@@ -49,12 +47,11 @@ export default function UploadPage() {
       files: [],
     },
   });
-  const { trigger, isMutating } = useSWRMutation(
-    '/api/gallery/upload',
-    uploadFile
-  );
+
   const { files, insertFiles, removeFile, resetFiles, updateFile } =
     useFileHandler(setValue);
+
+  const { trigger, isMutating } = useFileUpload(updateFile);
 
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
@@ -104,42 +101,6 @@ export default function UploadPage() {
     },
     [insertFiles, trigger, updateFile]
   );
-
-  async function uploadFile(
-    url: string,
-    { arg: fileWithPreview }: { arg: FileWithPreview }
-  ) {
-    const formData = new FormData();
-    formData.append('file', fileWithPreview.file, fileWithPreview.file.name);
-
-    try {
-      const response = await axios.post(url, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        onUploadProgress: (progressEvent) => {
-          const progress = Math.round(
-            (progressEvent.loaded * 100) / (progressEvent.total || 1)
-          );
-          if (progress >= 100) {
-            updateFile(fileWithPreview.id, {
-              status: 'success',
-              progress: 100,
-            });
-          } else {
-            updateFile(fileWithPreview.id, {
-              progress,
-              status: 'uploading',
-            });
-          }
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error('🚀 | uploadFile | error:', fileWithPreview.file.name);
-      throw error;
-    }
-  }
 
   const onSubmit = async (data: FormData) => {
     const isStillUploading = files.some((file) => file.status === 'uploading');
