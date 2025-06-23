@@ -84,6 +84,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             // });
           } else {
             // OAuth 로그인 시 사용자 정보를 내 서버 정보로 업데이트 해야 함
+            user.id = findUser?.id;
             user.name = findUser?.name ?? user.name;
             user.image = findUser?.image ?? user.image;
             user.role = findUser?.role ?? Role.USER;
@@ -105,6 +106,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       // 🔑 user 정보를 토큰에 저장(토큰 생성 시에만 user 정보가 있음)
       if (user) {
+        token.id = user.id;
         token.role = user.role;
       }
       return token;

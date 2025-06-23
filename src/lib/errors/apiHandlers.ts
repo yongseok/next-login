@@ -30,15 +30,17 @@ export function createApiErrorResponse(
     return NextResponse.json(response, { status: error.statusCode });
   }
 
-  if (error instanceof PrismaClientKnownRequestError) {
+  if (error.name === 'PrismaClientKnownRequestError') {
+    const prismaError = error as PrismaClientKnownRequestError;
     const response: ApiErrorResponse = {
-      error: error.message,
-      code: error.code,
+      error: isProd ? 'Internal Server Error' : prismaError.message,
+      code: prismaError.code,
       details: isProd
         ? undefined
-        : { meta: error.meta, clientVersion: error.clientVersion },
+        : { meta: prismaError.meta, clientVersion: prismaError.clientVersion },
     };
 
+    console.error('🚨 PrismaClientKnownRequestError:', prismaError.message);
     return NextResponse.json(response, { status: 500 });
   }
 

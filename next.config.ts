@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from 'next-intl/plugin';
+import path from 'path';
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -17,6 +18,10 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+  },
+  webpack(config) {
+    config.resolve.alias['@/messages'] = path.resolve(__dirname, 'messages');
+    return config;
   },
 };
 

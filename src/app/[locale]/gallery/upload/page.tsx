@@ -19,6 +19,7 @@ import FileListItem from './components/FileListItem';
 import { toast } from 'sonner';
 import { useFileHandler } from '@/lib/hooks/useFileHandler';
 import { useFileUpload } from '@/lib/swr/useFile';
+import { useSession } from 'next-auth/react';
 
 type FormData = {
   title: string;
@@ -33,6 +34,9 @@ type FormData = {
  *   - [ ] 임시 저장 파일 삭제 처리(https://grok.com/share/bGVnYWN5_0a3cf627-aac4-4090-9c50-8eff75690b2f)
  */
 export default function UploadPage() {
+  const { data: session } = useSession();
+  console.log('🚀 | UploadPage | session:', session);
+  
   const t = useTranslations('upload');
   const [isDragOver, setIsDragOver] = useState(false);
   const {
@@ -122,6 +126,7 @@ export default function UploadPage() {
     }
 
     const successfulUploads = files.filter((file) => file.status === 'success');
+
     if (successfulUploads.length === 0) {
       toast.error('업로드된 파일이 없습니다.');
       return;
@@ -138,7 +143,25 @@ export default function UploadPage() {
       ...data,
       files: successfulUploads,
     });
-    toast.success('갤러리 정보를 성공적으로 제출했습니다. (콘솔 로그 확인)');
+    const formData = new FormData();
+    formData.append('title', data.title);
+    formData.append('description', data.description);
+    formData.append('fileList', JSON.stringify(successfulUploads.map((file) => file.id)));
+
+    const response = await fetch('/api/galleries', {
+      method: 'POST',
+      // body: JSON.stringify({
+      //   title: data.title,
+      //   description: data.description,
+      //   fileList: successfulUploads.map((file) => file.id),
+      // }),
+      body: formData,
+    });
+    if (response.ok) {
+      toast.success('갤러리 정보를 성공적으로 제출했습니다. (콘솔 로그 확인)');
+    } else {
+      toast.error('갤러리 정보 제출에 실패했습니다. 다시 시도해주세요.');
+    }
   };
   return (
     <div className='w-full max-w-7xl mx-auto p-4 sm:p-6'>

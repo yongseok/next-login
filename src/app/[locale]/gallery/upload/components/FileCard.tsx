@@ -30,13 +30,13 @@ export default function FileCard({
             {file.preview ? (
               <Image
                 src={file.preview}
-                alt={file.name}
+                alt={file.file.name}
                 className='w-full h-10 sm:w-12 sm:h-12 object-cover rounded'
                 fill
               />
             ) : (
               <div className='h-full w-full rounded flex items-center justify-center'>
-                {getFileIcon(file.type)}
+                {getFileIcon(file.file.type)}
               </div>
             )}
           </div>
@@ -44,9 +44,9 @@ export default function FileCard({
           {/* 파일 정보 */}
           <div className='space-y-1'>
             <h3 className='text-xs sm:text-sm font-medium truncate '>
-              {file.name || t('unknown file')}
+              {file.file.name || t('unknown file')}
             </h3>
-            <p className='text-xs text-gray-500'>{formatFileSize(file.size)}</p>
+            <p className='text-xs text-gray-500'>{formatFileSize(file.file.size)}</p>
 
             {/* 업로드 진행률 */}
             {file.status === 'uploading' && file.progress !== undefined && (

@@ -35,7 +35,7 @@ export const useFileUpload = (
   }, []);
 
   const { trigger, isMutating } = useSWRMutation(
-    API_ENDPOINTS.GALLERY.UPLOAD,
+    API_ENDPOINTS.FILES.UPLOAD,
     (url, { arg: fileWithPreview }: { arg: FileWithPreview }) => {
       const abortController = new AbortController();
       abortControllerRef.current.set(fileWithPreview.id, abortController);

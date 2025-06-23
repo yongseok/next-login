@@ -26,6 +26,7 @@ import {
 } from './ui/select';
 import Link from 'next/link';
 import { Role } from '@prisma/client';
+import { useTranslations } from 'next-intl';
 
 interface UserFormProps {
   onSubmit: (data: UserUpdateDto) => void;
@@ -34,9 +35,10 @@ interface UserFormProps {
 
 export function UserForm({ onSubmit, children }: UserFormProps) {
   const { data: session, status } = useSession();
+  const t = useTranslations('UserForm');
 
   const form = useForm<UserUpdateDto>({
-    resolver: zodResolver(userUpdateSchema),
+    resolver: zodResolver(userUpdateSchema(t)),
     defaultValues: {
       name: session?.user?.name ?? '',
       email: session?.user?.email ?? '',

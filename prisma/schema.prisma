@@ -53,6 +53,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   role          Role    @default(USER)
+  galleries Gallery[]
+  uploadedFiles GalleryFile[] @relation("UploadedFiles")
 }
 
 model VerificationToken {
@@ -68,4 +70,38 @@ model VerificationToken {
 enum Role {
   USER
   ADMIN
+}
+
+model Gallery {
+  id String @id @default(cuid())
+  title String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  authorId String
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  files GalleryFile[]
+}
+
+model GalleryFile {
+  id        String   @id @default(cuid())
+  /// 저장소(S3, 로컬 등)에서 파일에 접근하기 위한 경로 또는 전체 URL
+  url       String
+  /// 사용자가 업로드한 원본 파일 이름 (e.g., "jeju_photo.jpg")
+  filename  String
+  /// 파일의 MIME 타입 (e.g., "image/jpeg", "video/mp4")
+  mimetype  String
+  /// 파일 크기 (bytes 단위)
+  size      Int
+  createdAt DateTime @default(now())
+
+  // 관계: 파일은 하나의 갤러리(Gallery)에 속합니다.
+  galleryId String?
+  gallery   Gallery?  @relation(fields: [galleryId], references: [id], onDelete: Cascade)
+
+  // 관계: 파일은 한 명의 업로더(User)에 의해 업로드됩니다.
+  uploaderId String
+  uploader   User     @relation("UploadedFiles", fields: [uploaderId], references: [id], onDelete: Cascade)
+
+  @@index([galleryId])
 }

@@ -90,20 +90,17 @@ export default function UploadDialog() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedFiles((prevFiles) => {
       const existSet = new Set(
-        prevFiles.map((file) => `${file.name}_${file.size}`)
+        prevFiles.map((file) => `${file.file.name}_${file.file.size}`)
       );
       const newFiles: FileWithPreview[] = Array.from(e.target.files || [])
         .filter((file) => !existSet.has(`${file.name}_${file.size}`))
         .map((file) => ({
-          ...file,
+          file,
           id: crypto.randomUUID(),
-          name: file.name,
-          size: file.size,
-          type: file.type,
-          status: 'pending',
           preview: file.type.startsWith('image')
             ? URL.createObjectURL(file)
             : undefined,
+          status: 'pending',
         }));
 
       const newFileList = [...prevFiles, ...newFiles];
@@ -193,9 +190,9 @@ export default function UploadDialog() {
                     <ScrollArea>
                       <div className='flex w-full space-x-4 p-1'>
                         {Array.from(selectedFiles).map((file) => (
-                          <div key={file.name} className=''>
+                          <div key={file.file.name} className=''>
                             <FileCard
-                              key={file.name}
+                              key={file.file.name}
                               file={file}
                               removeFile={removeFile}
                             />

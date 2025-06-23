@@ -5,6 +5,9 @@ export const API_ENDPOINTS = {
     GET: (id: string) => `${API_URL}/users/${id}`,
     UPDATE: (id: string) => `${API_URL}/users/${id}`,
   },
+  FILES: {
+    UPLOAD: `${API_URL}/files/upload`,
+  },
   GALLERY: {
     UPLOAD: `${API_URL}/gallery/upload`,
     GET_ALL: `${API_URL}/gallery`,
