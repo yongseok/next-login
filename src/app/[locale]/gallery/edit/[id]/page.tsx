@@ -11,7 +11,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useFileListState } from '@/lib/hooks/useFileListState';
 import { useGetGalleryById } from '@/lib/swr/useGalleries';
 import {
   DESCRIPTION_MAX_LENGTH,
