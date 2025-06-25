@@ -34,9 +34,6 @@ type FormData = {
  *   - [ ] 임시 저장 파일 삭제 처리(https://grok.com/share/bGVnYWN5_0a3cf627-aac4-4090-9c50-8eff75690b2f)
  */
 export default function UploadPage() {
-  const { data: session } = useSession();
-  console.log('🚀 | UploadPage | session:', session);
-  
   const t = useTranslations('upload');
   const [isDragOver, setIsDragOver] = useState(false);
   const {
@@ -146,7 +143,14 @@ export default function UploadPage() {
     const formData = new FormData();
     formData.append('title', data.title);
     formData.append('description', data.description);
-    formData.append('fileList', JSON.stringify(successfulUploads.map((file) => file.id)));
+    formData.append(
+      'fileList',
+      JSON.stringify(
+        successfulUploads.map((file) =>
+          file.status === 'success' ? file.id : null
+        )
+      )
+    );
 
     const response = await fetch('/api/galleries', {
       method: 'POST',

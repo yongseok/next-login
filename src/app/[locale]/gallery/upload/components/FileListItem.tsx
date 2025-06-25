@@ -68,9 +68,23 @@ function FileListItem({
             </Badge>
           )}
           {file.status === 'error' && (
-            <Badge variant='destructive' className='text-xs rounded-full'>
-              {t('error')}
-            </Badge>
+            <div className='flex items-center gap-2'>
+              <Badge
+                variant='destructive'
+                className='group-hover:hidden text-xs rounded-full'
+              >
+                {t('error')}
+              </Badge>
+              <Button
+                type='button'
+                variant='ghost'
+                size='sm'
+                className='hidden group-hover:block h-8 w-8 p-0 hover:cursor-pointer'
+                onClick={() => updateFile(file.id, { status: 'pending' })}
+              >
+                <RefreshCcw className='w-4 h-4' />
+              </Button>
+            </div>
           )}
           {file.status === 'success' && (
             <Badge

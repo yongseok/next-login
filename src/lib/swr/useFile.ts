@@ -5,18 +5,6 @@ import { uploadFileWithPreview } from './fetcher';
 import { useCallback, useRef } from 'react';
 import axios from 'axios';
 
-class UploadError extends Error {
-  fileWithPreview: FileWithPreview;
-  cause?: unknown;
-
-  constructor(message: string, file: FileWithPreview, options?: ErrorOptions) {
-    super(message, options);
-    this.name = 'UploadError';
-    this.fileWithPreview = file;
-    this.cause = options?.cause;
-  }
-}
-
 /**
  * 파일 업로드 처리
  * @param updateFile 파일 상태 업데이트 함수
@@ -52,38 +40,50 @@ export const useFileUpload = (
         }
       );
 
-      return promise
-        .then((result) => ({ result, fileWithPreview })) // 🔑 onSuccess 에서 사용됨
-        .catch((error) => {
-          console.log('🚀 | error:', error);
-          const message =
-            error instanceof Error ? error.message : 'Upload failed';
-          throw new UploadError(message, fileWithPreview, { cause: error }); // 🔑 onError 에서 사용됨
-        })
-        .finally(() => {
-          abortControllerRef.current.delete(fileWithPreview.id);
-        });
-    },
-    {
-      throwOnError: false,
-      onSuccess: ({ fileWithPreview }) => {
+      const onMySuccess = ({
+        fileWithPreview,
+      }: {
+        fileWithPreview: FileWithPreview;
+      }) => {
+        if (!fileWithPreview?.id) {
+          return;
+        }
         updateFile(fileWithPreview.id, {
           progress: 100,
           status: 'success' as const,
         });
-      },
-      onError: (err) => {
-        if (err instanceof UploadError) {
-          const { fileWithPreview, cause } = err;
-          console.log('🚀 | cause:', cause);
-          if (axios.isCancel(cause)) {
-            updateFile(fileWithPreview.id, { status: 'canceled' });
-            return;
-          }
-          updateFile(fileWithPreview.id, { status: 'error' });
+      };
+
+      const onMyError = (error: Error) => {
+        if (axios.isCancel(error)) {
+          updateFile(fileWithPreview.id, { status: 'canceled' });
+          return;
         }
-      },
-    }
+        updateFile(fileWithPreview.id, { status: 'error' });
+      };
+
+      return promise
+        .then(() => {
+          onMySuccess({ fileWithPreview });
+        }) // 🔑 리턴값은 onSuccess 에서 사용됨
+        .catch((error) => {
+          onMyError(error);
+        }) // 🔑 여기서 throw 되면 onError 에서 사용됨
+        .finally(() => {
+          abortControllerRef.current.delete(fileWithPreview.id);
+        });
+    },
+      {
+        throwOnError: false,
+        onSuccess: () => {
+          // 🤔 여러 번 trigger를 연속적으로 호출하면, 내부적으로 마지막 mutation의 결과만을 처리되는 문제있음.
+          // 그래서 내부에서 처리하는 함수를 따로 만들어서 사용함.
+        },
+        onError: () => {
+          // 🤔 여러 번 trigger를 연속적으로 호출하면, 내부적으로 마지막 mutation의 결과만을 처리되는 문제있음.
+          // 그래서 내부에서 처리하는 함수를 따로 만들어서 사용함.
+        },
+      }
   );
 
   return { trigger, isMutating, abort };

@@ -17,9 +17,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
+    const fileId = formData.get('id') as string;
+    if (!fileId) {
+      return NextResponse.json(
+        { error: 'No file id uploaded' },
+        { status: 400 }
+      );
+    }
+
     // 저장 경로 설정 (예: public/uploads)
     const uploadDir = path.join(process.env.UPLOAD_PATH!, 'files');
-    console.log('🚀 | POST | uploadDir:', uploadDir);
     await mkdir(uploadDir, { recursive: true });
     const filename = `${Date.now()}-${file.name}`;
     const filepath = path.join(uploadDir, filename);
@@ -34,6 +41,7 @@ export async function POST(request: NextRequest) {
 
     // 파일 정보를 데이터베이스에 저장
     await galleryFileRepository.createGalleryFile({
+      id: fileId,
       url: filepath,
       filename,
       mimetype: file.type,
