@@ -11,7 +11,7 @@ export const API_ENDPOINTS = {
   GALLERY: {
     UPLOAD: `${API_URL}/gallery/upload`,
     GET_ALL: `${API_URL}/gallery`,
-    GET: (id: string) => `${API_URL}/gallery/${id}`,
+    GET: (id: string) => `${API_URL}/galleries/${id}`,
     UPDATE: (id: string) => `${API_URL}/gallery/${id}`,
     DELETE: (id: string) => `${API_URL}/gallery/${id}`,
   },

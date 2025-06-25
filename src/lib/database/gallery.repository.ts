@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, Gallery } from '@prisma/client';
+import { Prisma, PrismaClient, Gallery, GalleryFile } from '@prisma/client';
 import { prisma } from './prisma';
 
 export class GalleryRepository {
@@ -11,15 +11,36 @@ export class GalleryRepository {
     return this.prisma.gallery.create({ data: gallery });
   }
 
-  async getGalleryById(id: string): Promise<Gallery | null> {
-    return this.prisma.gallery.findUnique({ where: { id } });
+  async getGalleryById(
+    id: string
+  ): Promise<Partial<Gallery & { files: Pick<GalleryFile, 'id' | 'url' | 'filename' | 'mimetype' | 'size'>[] }> | null> {
+    return this.prisma.gallery.findUnique({
+      where: { id },
+      select: {
+        title: true,
+        description: true,
+        updatedAt: true,
+        files: {
+          select: {
+            id: true,
+            url: true,
+            filename: true,
+            mimetype: true,
+            size: true,
+          },
+        },
+      },
+    });
   }
 
   async getGalleryByUserId(userId: string): Promise<Gallery[]> {
     return this.prisma.gallery.findMany({ where: { authorId: userId } });
   }
 
-  async updateGallery(id: string, gallery: Prisma.GalleryUpdateInput): Promise<Gallery> {
+  async updateGallery(
+    id: string,
+    gallery: Prisma.GalleryUpdateInput
+  ): Promise<Gallery> {
     return this.prisma.gallery.update({ where: { id }, data: gallery });
   }
 
@@ -27,7 +48,11 @@ export class GalleryRepository {
     await this.prisma.gallery.delete({ where: { id } });
   }
 
-  async getPagedGalleries(page: number, limit: number, orderBy: Prisma.GalleryOrderByWithRelationInput = { createdAt: 'desc' }): Promise<Gallery[]> {
+  async getPagedGalleries(
+    page: number,
+    limit: number,
+    orderBy: Prisma.GalleryOrderByWithRelationInput = { createdAt: 'desc' }
+  ): Promise<Gallery[]> {
     return this.prisma.gallery.findMany({
       skip: (page - 1) * limit,
       take: limit,

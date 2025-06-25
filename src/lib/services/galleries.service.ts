@@ -1,4 +1,4 @@
-import { Gallery, Prisma } from '@prisma/client';
+import { Gallery, GalleryFile, Prisma } from '@prisma/client';
 import { galleryRepository } from '../database/gallery.repository';
 
 class GalleryService {
@@ -8,7 +8,13 @@ class GalleryService {
     return this.galleryRepo.createGallery(gallery);
   }
 
-  async getGalleryById(id: string): Promise<Gallery | null> {
+  async getGalleryById(
+    id: string
+  ): Promise<Partial<
+    Gallery & {
+      files: Pick<GalleryFile, 'id' | 'url' | 'filename' | 'mimetype' | 'size'>[];
+    }
+  > | null> {
     return this.galleryRepo.getGalleryById(id);
   }
 
@@ -16,7 +22,10 @@ class GalleryService {
     return this.galleryRepo.getGalleryByUserId(userId);
   }
 
-  async updateGallery(id: string, gallery: Prisma.GalleryUpdateInput): Promise<Gallery> {
+  async updateGallery(
+    id: string,
+    gallery: Prisma.GalleryUpdateInput
+  ): Promise<Gallery> {
     return this.galleryRepo.updateGallery(id, gallery);
   }
 
@@ -24,7 +33,11 @@ class GalleryService {
     return this.galleryRepo.deleteGallery(id);
   }
 
-  async getPagedGalleries(page: number, limit: number, orderBy: Prisma.GalleryOrderByWithRelationInput): Promise<Gallery[]> {
+  async getPagedGalleries(
+    page: number,
+    limit: number,
+    orderBy: Prisma.GalleryOrderByWithRelationInput
+  ): Promise<Gallery[]> {
     return this.galleryRepo.getPagedGalleries(page, limit, orderBy);
   }
 

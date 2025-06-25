@@ -1,4 +1,4 @@
-import multer from 'multer';
+// import multer from 'multer';
 import { NextRequest, NextResponse } from 'next/server';
 import { mkdir, writeFile } from 'fs/promises';
 import path from 'path';
@@ -107,17 +107,17 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(data);
 }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + '-' + file.originalname);
-  },
-});
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'uploads/');
+//   },
+//   filename: (req, file, cb) => {
+//     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+//     cb(null, uniqueSuffix + '-' + file.originalname);
+//   },
+// });
 
-const upload = multer({ storage, limits: { fileSize: 1024 * 1024 * 5 } });
+// const upload = multer({ storage, limits: { fileSize: 1024 * 1024 * 5 } });
 
 export async function POST(request: NextRequest) {
   try {

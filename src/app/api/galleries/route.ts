@@ -52,7 +52,7 @@ export const POST = withApiErrorHandler(async (request: NextRequest) => {
       },
     },
     files: {
-      connect: result.data.fileList.map((id: string) => ({ id })),
+      connect: result.data.fileList.map((file) => ({ id: file.id })),
     },
   });
 

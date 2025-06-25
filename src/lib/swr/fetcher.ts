@@ -35,3 +35,8 @@ export const uploadFileWithPreview = async (
   });
   return response.data;
 };
+
+export const getGalleryById = async (url: string) => {
+  const response = await fetch(url);
+  return response.json();
+};

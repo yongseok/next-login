@@ -17,9 +17,9 @@ import { useCallback, useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import FileListItem from './components/FileListItem';
 import { toast } from 'sonner';
-import { useFileHandler } from '@/lib/hooks/useFileHandler';
-import { useFileUpload } from '@/lib/swr/useFile';
-import { useSession } from 'next-auth/react';
+import { useFileListState } from '@/lib/hooks/useFileListState';
+import { useFileUpload } from '@/lib/swr/useFileUpload';
+import { useRouter } from 'next/navigation';
 
 type FormData = {
   title: string;
@@ -35,6 +35,7 @@ type FormData = {
  */
 export default function UploadPage() {
   const t = useTranslations('upload');
+  const router = useRouter();
   const [isDragOver, setIsDragOver] = useState(false);
   const {
     register,
@@ -50,7 +51,7 @@ export default function UploadPage() {
   });
 
   const { files, insertFiles, removeFile, resetFiles, updateFile } =
-    useFileHandler(setValue);
+    useFileListState(setValue);
 
   const { trigger, isMutating, abort } = useFileUpload(updateFile);
 
@@ -162,6 +163,9 @@ export default function UploadPage() {
       body: formData,
     });
     if (response.ok) {
+      const data = await response.json();
+      console.log('🚀 | onSubmit | response:', data);
+      router.push(`/gallery/detail/${data.id}`);
       toast.success('갤러리 정보를 성공적으로 제출했습니다. (콘솔 로그 확인)');
     } else {
       toast.error('갤러리 정보 제출에 실패했습니다. 다시 시도해주세요.');

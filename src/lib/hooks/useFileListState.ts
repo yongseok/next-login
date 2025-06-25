@@ -15,7 +15,7 @@ type FormData = {
  * @param setValue 폼 값 설정 함수
  * @returns 파일 전송 상태 관리 함수
  */
-export const useFileHandler = (setValue: UseFormSetValue<FormData>) => {
+export const useFileListState = (setValue: UseFormSetValue<FormData>) => {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
 
   const updateFile = useCallback(

@@ -39,10 +39,13 @@ export async function POST(request: NextRequest) {
     // 파일 저장
     await writeFile(filepath, fileBuffer);
 
+    // 파일 다운로드 주소 생성
+    const fileUrl = path.join(process.env.UPLOAD_URL!, 'files', filename);
+
     // 파일 정보를 데이터베이스에 저장
     await galleryFileRepository.createGalleryFile({
       id: fileId,
-      url: filepath,
+      url: fileUrl,
       filename,
       mimetype: file.type,
       size: file.size,
@@ -56,7 +59,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: 'File uploaded successfully',
       filename,
-      url: `${uploadDir}/${filename}`,
+      url: fileUrl,
     });
   } catch (error) {
     console.error('🚀 | POST | error:', error);
