@@ -32,27 +32,22 @@ export const POST = withApiErrorHandler(async (request: NextRequest) => {
   }
 
   // 유효성 검사
-  const result = gallerySchema.safeParse({
+  const result = gallerySchema.parse({
     title,
     description,
     fileList,
   });
 
-  if (!result.success) {
-    const errors = result.error.errors.map((error) => error.message);
-    throw new Error(errors.join(', '));
-  }
-
   const gallery = await galleryService.createGallery({
-    title: result.data.title,
-    description: result.data.description,
+    title: result.title,
+    description: result.description,
     author: {
       connect: {
         id: session.user.id,
       },
     },
     files: {
-      connect: result.data.fileList.map((file) => ({ id: file.id })),
+      connect: result.fileList.map((file) => ({ id: file.id })),
     },
   });
 

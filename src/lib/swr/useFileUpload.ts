@@ -1,6 +1,6 @@
 import useSWRMutation from 'swr/mutation';
 import { API_ENDPOINTS } from '../config/api';
-import { FileWithPreview } from '@/types/gallery';
+import { FileData, FileTransferInfo } from '@/types/gallery';
 import { uploadFileWithPreview } from './fetcher';
 import { useCallback, useRef } from 'react';
 import axios from 'axios';
@@ -11,7 +11,7 @@ import axios from 'axios';
  * @returns 파일 업로드 트리거 함수와 업로드 중 여부
  */
 export const useFileUpload = (
-  updateFile: (id: string, file: Partial<FileWithPreview>) => void
+  updateFile: (id: string, status: Partial<FileTransferInfo>) => void
 ) => {
   const abortControllerRef = useRef<Map<string, AbortController>>(new Map());
   const abort = useCallback((id: string) => {
@@ -24,53 +24,55 @@ export const useFileUpload = (
 
   const { trigger, isMutating } = useSWRMutation(
     API_ENDPOINTS.FILES.UPLOAD,
-    (url, { arg: fileWithPreview }: { arg: FileWithPreview }) => {
+    (url, { arg: fileData }: { arg: FileData }) => {
       const abortController = new AbortController();
-      abortControllerRef.current.set(fileWithPreview.id, abortController);
+      abortControllerRef.current.set(fileData.id, abortController);
 
       const promise = uploadFileWithPreview(
         url,
-        fileWithPreview,
+        fileData,
         abortController.signal,
         (progress: number) => {
-          updateFile(fileWithPreview.id, {
-            progress,
-            status: 'uploading' as const,
+          updateFile(fileData.id, {
+              progress,
+              status: 'uploading',
           });
         }
       );
 
       const onMySuccess = ({
-        fileWithPreview,
+        fileData,
       }: {
-        fileWithPreview: FileWithPreview;
+        fileData: FileData;
       }) => {
-        if (!fileWithPreview?.id) {
+        if (!fileData?.id) {
           return;
         }
-        updateFile(fileWithPreview.id, {
-          progress: 100,
-          status: 'success' as const,
+        updateFile(fileData.id, {
+            progress: 100,
+            status: 'success',
         });
       };
 
       const onMyError = (error: Error) => {
         if (axios.isCancel(error)) {
-          updateFile(fileWithPreview.id, { status: 'canceled' });
+          updateFile(fileData.id, {
+              status: 'canceled'
+          });
           return;
         }
-        updateFile(fileWithPreview.id, { status: 'error' });
+        updateFile(fileData.id, { status: 'error' });
       };
 
       return promise
         .then(() => {
-          onMySuccess({ fileWithPreview });
+          onMySuccess({ fileData });
         }) // 🔑 리턴값은 onSuccess 에서 사용됨
         .catch((error) => {
           onMyError(error);
         }) // 🔑 여기서 throw 되면 onError 에서 사용됨
         .finally(() => {
-          abortControllerRef.current.delete(fileWithPreview.id);
+          abortControllerRef.current.delete(fileData.id);
         });
     },
       {

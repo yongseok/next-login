@@ -10,21 +10,23 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
-import { Upload } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useCallback, useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import FileListItem from './components/FileListItem';
 import { toast } from 'sonner';
 import { useFileListState } from '@/lib/hooks/useFileListState';
 import { useFileUpload } from '@/lib/swr/useFileUpload';
 import { useRouter } from 'next/navigation';
+import { FileData } from '@/types/gallery';
+import FileInput from '@/components/FileInput';
+import useFileInputDragDrop from '@/lib/hooks/useFileInputDragDrop';
+import FileInputDragDrop from '@/components/FileInputDragDrop';
 
 type FormData = {
   title: string;
   description: string;
-  files: File[];
+  files: FileData[];
 };
 /*
  * 기능 구현 예정
@@ -36,7 +38,6 @@ type FormData = {
 export default function UploadPage() {
   const t = useTranslations('upload');
   const router = useRouter();
-  const [isDragOver, setIsDragOver] = useState(false);
   const {
     register,
     handleSubmit,
@@ -50,10 +51,19 @@ export default function UploadPage() {
     },
   });
 
-  const { files, insertFiles, removeFile, resetFiles, updateFile } =
-    useFileListState(setValue);
+  const {
+    files,
+    insertLocalFiles: insertFiles,
+    removeFile,
+    resetFiles,
+    updateTransfer,
+  } = useFileListState();
 
-  const { trigger, isMutating, abort } = useFileUpload(updateFile);
+  useEffect(() => {
+    setValue('files', files, { shouldValidate: false });
+  }, [files, setValue]);
+
+  const { trigger, isMutating, abort } = useFileUpload(updateTransfer);
 
   /**
    * 파일 업로드 부수 효과(side effect) 처리.
@@ -71,51 +81,26 @@ export default function UploadPage() {
    * 상태 동기화의 복잡성을 피해 코드를 더 견고하고 예측 가능하게 만듭니다.
    */
   useEffect(() => {
-    const filesToUpload = files.filter((file) => file.status === 'pending');
+    const filesToUpload = files.filter(
+      (file) => file.type === 'local' && file.transfer?.status === 'pending'
+    );
     if (filesToUpload.length > 0) {
       filesToUpload.forEach((file) => {
         // 중복 실행을 막기 위해 상태를 즉시 변경하고 업로드를 트리거합니다.
-        updateFile(file.id, { status: 'uploading', progress: 0 });
+        updateTransfer(file.id, { status: 'uploading', progress: 0 });
         trigger(file);
       });
     }
-  }, [files, trigger, updateFile]);
+  }, [files, trigger, updateTransfer]);
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      setIsDragOver(false);
-
-      const droppedFiles = e.dataTransfer.files;
-      if (droppedFiles.length > 0) {
-        insertFiles(droppedFiles);
-      }
-    },
-    [insertFiles]
-  );
-
-  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  }, []);
-
-  const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setIsDragOver(false);
-  }, []);
-
-  const handleFileInput = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const selectedFiles = e.target.files;
-      if (selectedFiles && selectedFiles.length > 0) {
-        insertFiles(selectedFiles);
-      }
-    },
-    [insertFiles]
-  );
+  /** 파일 드롭 영역 상태 관리 **/
+  const { isDragOver, handleDrop, handleDragOver, handleDragLeave } =
+    useFileInputDragDrop({ insertFiles });
 
   const onSubmit = async (data: FormData) => {
-    const isStillUploading = files.some((file) => file.status === 'uploading');
+    const isStillUploading = files.some(
+      (file) => file.type === 'local' && file.transfer?.status === 'uploading'
+    );
     if (isStillUploading) {
       toast.error(
         '아직 업로드 중인 파일이 있습니다. 잠시 후 다시 시도해주세요.'
@@ -123,24 +108,25 @@ export default function UploadPage() {
       return;
     }
 
-    const successfulUploads = files.filter((file) => file.status === 'success');
+    const successfulUploads = files.filter(
+      (file) => file.type === 'local' && file.transfer?.status === 'success'
+    );
 
     if (successfulUploads.length === 0) {
       toast.error('업로드된 파일이 없습니다.');
       return;
     }
 
-    if (files.some((file) => file.status === 'error')) {
+    if (
+      files.some(
+        (file) => file.type === 'local' && file.transfer?.status === 'error'
+      )
+    ) {
       toast.error('오류가 발생한 파일이 있습니다. 확인 후 다시 시도해주세요.');
       return;
     }
 
-    // TODO: 갤러리 생성 API 호출
-    // data.title, data.description, successfulUploads 정보를 사용
-    console.log('Creating gallery with:', {
-      ...data,
-      files: successfulUploads,
-    });
+    // 갤러리 생성 API 호출
     const formData = new FormData();
     formData.append('title', data.title);
     formData.append('description', data.description);
@@ -148,7 +134,14 @@ export default function UploadPage() {
       'fileList',
       JSON.stringify(
         successfulUploads.map((file) =>
-          file.status === 'success' ? file.id : null
+          file.type === 'local' && file.transfer?.status === 'success'
+            ? {
+                id: file.id,
+                filename: file.info.filename,
+                mimetype: file.info.mimetype,
+                size: file.info.size,
+              }
+            : null
         )
       )
     );
@@ -171,6 +164,7 @@ export default function UploadPage() {
       toast.error('갤러리 정보 제출에 실패했습니다. 다시 시도해주세요.');
     }
   };
+
   return (
     <div className='w-full max-w-7xl mx-auto p-4 sm:p-6'>
       <Card>
@@ -205,55 +199,19 @@ export default function UploadPage() {
                 )}
               </div>
             </div>
-
-            {/* 파일 드롭 영역 */}
+            {/* 파일 추가 영역 */}
             <div className='relative'>
-              <div
-                className={cn(
-                  'border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-colors',
-                  isDragOver
-                    ? 'border-primary bg-primary/5'
-                    : 'border-gray-300 hover:border-gray-400'
-                )}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
+              {/* 파일 드롭 영역 */}
+              <FileInputDragDrop
+                isDragOver={isDragOver}
+                isMutating={isMutating}
+                handleDrop={handleDrop}
+                handleDragOver={handleDragOver}
+                handleDragLeave={handleDragLeave}
               >
-                <Upload className='mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400 mb-3 sm:mb-4' />
-                <div className='space-y-2'>
-                  <p className='text-base sm:text-lg font-medium'>
-                    {t('dragAndDrop')}
-                  </p>
-                  <p className='text-xs sm:text-sm text-gray-500'>
-                    {t('supportedFormats')}
-                  </p>
-                </div>
-                <Input
-                  type='file'
-                  multiple
-                  onChange={handleFileInput}
-                  className='hidden'
-                  id='file-input'
-                  accept='*/*'
-                />
-                <Button
-                  type='button'
-                  className='mt-3 sm:mt-4 w-full sm:w-auto hover:cursor-pointer'
-                  onClick={() => document.getElementById('file-input')?.click()}
-                >
-                  파일 선택
-                </Button>
-              </div>
-              {isMutating && (
-                <div
-                  className='absolute inset-0 z-10 cursor-not-allowed'
-                  style={{
-                    background: 'rgba(255,255,255,0.5)',
-                    pointerEvents: 'all',
-                  }}
-                  aria-label='업로드 중에는 드래그 앤 드롭이 비활성화됩니다.'
-                ></div>
-              )}
+                {/* 파일 선택 버튼 */}
+                <FileInput insertLocalFiles={insertFiles} />
+              </FileInputDragDrop>
             </div>
 
             {/* 선택된 파일 목록 */}
@@ -269,7 +227,7 @@ export default function UploadPage() {
                       file={file}
                       removeFile={removeFile}
                       abort={abort}
-                      updateFile={updateFile}
+                      updateFile={updateTransfer}
                     />
                   ))}
                 </div>

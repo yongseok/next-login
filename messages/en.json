@@ -98,5 +98,9 @@
     "titlelabel": "title",
     "uploading": "Uploading",
     "canceled": "Canceled"
+  },
+  "FileInputDragDrop": {
+    "dragAndDrop": "Drag or click the file here to select",
+    "supportedFormats": "Support for all files such as PNG, JPG, PDF, DOC"
   }
 }

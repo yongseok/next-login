@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { UserUpdateDto } from '../validations/userUpdateSchema';
-import { FileWithPreview } from '@/types/gallery';
+import { FileData } from '@/types/gallery';
 
 export const updateUser = async (url: string, data: UserUpdateDto) => {
   const response = await fetch(url, {
@@ -17,11 +17,18 @@ export const getUserByEmail = async (url: string) => {
 
 export const uploadFileWithPreview = async (
   url: string,
-  data: FileWithPreview,
+  data: FileData,
   signal: AbortSignal | undefined,
   onUploadProgress: (progress: number) => void
 ) => {
-  const response = await axios.post(url, data, {
+  if (data.type !== 'local') {
+    throw new Error('File type is not local');
+  }
+  const formData = new FormData();
+  formData.append('file', data.file);
+  formData.append('id', data.id);
+  formData.append('type', data.type);
+  const response = await axios.post(url, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

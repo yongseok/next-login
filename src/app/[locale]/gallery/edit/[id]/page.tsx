@@ -1,6 +1,7 @@
 'use client';
 
-import PhotoListItem from '@/components/PhotoListItem';
+import ErrorComponent from '@/components/ErrorComponent';
+import LoadingComponent from '@/components/LoadingComponent';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -11,6 +12,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { useFileListState } from '@/lib/hooks/useFileListState';
 import { useGetGalleryById } from '@/lib/swr/useGalleries';
 import {
   DESCRIPTION_MAX_LENGTH,
@@ -19,17 +21,18 @@ import {
 } from '@/lib/validations/gallerySchema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useParams } from 'next/navigation';
-import path from 'path';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import type { FileData } from '@/types/gallery';
+import { useFileUpload } from '@/lib/swr/useFileUpload';
+import FileListItem from '@/app/[locale]/gallery/upload/components/FileListItem';
+import FileInput from '@/components/FileInput';
 
 export default function GalleryEditPage() {
-  const params = useParams();
-  const { id } = params;
-
+  const { id } = useParams();
   const { data: gallery, error, isLoading } = useGetGalleryById(id as string);
-  console.log('🚀 | GalleryEditPage | gallery:', gallery);
 
+  /** 폼 상태 관리 & 유효성 검사 **/
   const form = useForm<GalleryFormValues>({
     resolver: zodResolver(gallerySchema),
     defaultValues: {
@@ -43,70 +46,85 @@ export default function GalleryEditPage() {
     formState: { errors },
   } = form;
 
+  /** 파일 상태 관리 **/
+  const {
+    files,
+    insertLocalFiles,
+    insertServerFiles,
+    updateTransfer,
+    removeFile,
+  } = useFileListState();
+
+  /** 파일 업로드 관리 **/
+  const { trigger, abort } = useFileUpload(updateTransfer);
+
+  /** 서버에서 가져온 파일 추가 **/
   useEffect(() => {
     if (gallery) {
-      form.reset({
-        title: gallery.title,
-        description: gallery.description,
-        fileList: gallery.files,
+      insertServerFiles(
+        gallery.files.map(
+          (file: {
+            id: string;
+            filename: string;
+            mimetype: string;
+            size: number;
+            url: string;
+          }) => ({
+            id: file.id,
+            info: {
+              filename: file.filename,
+              mimetype: file.mimetype,
+              size: file.size,
+            },
+            url: file.url,
+          })
+        )
+      );
+    }
+  }, [gallery, insertServerFiles]);
+
+  /** 로컬에서 선택한 파일 추가 **/
+  useEffect(() => {
+    if (files) {
+      form.setValue('fileList', files);
+    }
+  }, [files, form]);
+
+  /** 로컬에서 선택한 파일 업로드 **/
+  useEffect(() => {
+    const filesToUpload = files.filter(
+      (file) => file.type === 'local' && file.transfer?.status === 'pending'
+    );
+    if (filesToUpload.length > 0) {
+      filesToUpload.forEach((file) => {
+        // 중복 실행을 막기 위해 상태를 즉시 변경하고 업로드를 트리거합니다.
+        updateTransfer(file.id, { status: 'uploading', progress: 0 });
+        trigger(file);
       });
     }
-  }, [gallery, form]);
+  }, [files, trigger, updateTransfer]);
 
+  /** 폼 제출 **/
   const onSubmit = (data: GalleryFormValues) => {
     console.log('🚀 | GalleryEditPage | data:', data);
   };
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center min-h-[400px]'>
-        <div className='flex flex-col items-center gap-4'>
-          <div className='w-8 h-8 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin'></div>
-          <p className='text-sm text-muted-foreground'>
-            갤러리를 불러오는 중...
-          </p>
-        </div>
-      </div>
-    );
+    return <LoadingComponent message='갤러리를 불러오는 중...' />;
   }
 
   if (error) {
-    return (
-      <div className='flex items-center justify-center min-h-[400px]'>
-        <div className='flex flex-col items-center gap-4'>
-          <div className='w-12 h-12 rounded-full bg-red-100 flex items-center justify-center'>
-            <svg
-              className='w-6 h-6 text-red-600'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
-            >
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={2}
-                d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z'
-              />
-            </svg>
-          </div>
-          <div className='text-center'>
-            <h3 className='text-lg font-semibold text-gray-900 mb-2'>
-              오류가 발생했습니다
-            </h3>
-            <p className='text-sm text-muted-foreground max-w-md'>
-              {error.message}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
+    return <ErrorComponent error={error} />;
   }
 
   return (
-    <div>
-      <div>GalleryEditPage {id}</div>
+    <div className='w-full max-w-7xl mx-auto p-4 sm:p-6'>
+      <h1 className='scroll-m-20 text-center text-4xl font-extrabold tracking-tight text-balance'>
+        GalleryEditPage {id}
+      </h1>
       <Form {...form}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form className='flex flex-col gap-4' onSubmit={handleSubmit(onSubmit)}>
+          {/* 제목 */}
           <FormField
             control={form.control}
             name='title'
@@ -128,6 +146,7 @@ export default function GalleryEditPage() {
               </FormItem>
             )}
           />
+          {/* 설명 */}
           <FormField
             control={form.control}
             name='description'
@@ -153,35 +172,39 @@ export default function GalleryEditPage() {
               </FormItem>
             )}
           />
+          {/* 파일 리스트 */}
           <FormField
             control={form.control}
             name='fileList'
             render={({ field }) => {
-              console.log('🚀 | GalleryEditPage | field:', field.value);
               return (
                 <div className='flex flex-col gap-2'>
-                  {field.value?.map((file) => {
-                    const src = path.join(
-                      process.env.NEXT_PUBLIC_URL!,
-                      file.url
-                    );
+                  {(field.value as unknown[] as FileData[])?.map((file) => {
+                    if (!file.type || !file.info) return null;
                     return (
-                      <div key={file.id}>
-                        <PhotoListItem
-                          id={file.id}
-                          url={src}
-                          filename={file.filename}
-                          mimetype={file.mimetype}
-                          size={file.size}
-                        />
-                      </div>
+                      <FileListItem
+                        key={file.id}
+                        file={file}
+                        removeFile={removeFile}
+                        updateFile={updateTransfer}
+                        abort={abort}
+                      />
                     );
                   })}
                 </div>
               );
             }}
           />
-          <Button type='submit'>Submit</Button>
+          <div className='flex flex-col sm:flex-row gap-4 justify-end content-center'>
+            {/* 파일 추가 영역 */}
+            <FileInput
+              insertLocalFiles={insertLocalFiles}
+            />
+            {/* 제출 버튼 */}
+            <Button className='flex w-full sm:w-auto justify-center content-center' type='submit'>
+              Submit
+            </Button>
+          </div>
         </form>
       </Form>
     </div>
