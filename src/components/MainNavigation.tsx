@@ -23,7 +23,7 @@ export function MainNavigation() {
   }, []);
 
   return (
-    <nav className='flex items-center gap-4 justify-between'>
+    <nav className='flex items-center gap-4 justify-between px-4 sm:px-6 mx-auto max-w-7xl w-full'>
       <div className='flex items-center gap-4'>
         {routes.map((route) => (
           <Link
