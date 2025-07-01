@@ -4,6 +4,7 @@ import path from 'path';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  reactStrictMode: true,
   images: {
     remotePatterns: [
       {

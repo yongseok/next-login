@@ -137,9 +137,11 @@ export default function UploadPage() {
           file.type === 'local' && file.transfer?.status === 'success'
             ? {
                 id: file.id,
-                filename: file.info.filename,
-                mimetype: file.info.mimetype,
-                size: file.info.size,
+                info: {
+                  filename: file.info.filename,
+                  mimetype: file.info.mimetype,
+                  size: file.info.size,
+                },
               }
             : null
         )
@@ -226,8 +228,8 @@ export default function UploadPage() {
                       key={file.id}
                       file={file}
                       removeFile={removeFile}
-                      abort={abort}
                       updateFile={updateTransfer}
+                      abort={abort}
                     />
                   ))}
                 </div>

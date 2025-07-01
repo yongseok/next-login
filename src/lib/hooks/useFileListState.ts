@@ -6,6 +6,12 @@ import {
   ServerFile,
 } from '@/types/gallery';
 
+const log = (message: string, data?: unknown, print: boolean = false) => {
+  if (print) {
+    console.log('[useFileListState]', message, data);
+  }
+};
+
 /**
  * 파일 전송 상태 관리 훅
  */
@@ -14,16 +20,18 @@ export const useFileListState = () => {
 
   const updateTransfer = useCallback(
     (fileId: string, newStatus: Partial<FileTransferInfo>) => {
-      setFiles((prev) =>
-        prev.map((fileInfo) =>
+      setFiles((prev) => {
+        const newFiles = prev.map((fileInfo) =>
           fileInfo.id === fileId && fileInfo.type === 'local'
             ? {
                 ...fileInfo,
                 transfer: { ...fileInfo.transfer, ...newStatus },
               }
             : fileInfo
-        )
-      );
+        );
+        log('updateTransfer:', newFiles);
+        return newFiles;
+      });
     },
     []
   );
@@ -71,16 +79,17 @@ export const useFileListState = () => {
       });
 
       const updatedFiles = [...prevFiles, ...newLocalFiles];
-
+      log('insertLocalFiles:', updatedFiles);
       return updatedFiles;
     });
   }, []);
 
-  const insertServerFiles = useCallback((fileList: ServerFile[]) => {
+  const insertServerFiles = useCallback((fileList: ServerFile[] = []) => {
     setFiles((prevFiles) => {
-      const uniqueIncomingFiles = fileList.filter(
+      const uniqueIncomingFiles = fileList?.filter(
         (file) => !prevFiles.some((prevFile) => prevFile.id === file.id)
       );
+      console.log('🚀 | setFiles | uniqueIncomingFiles:', uniqueIncomingFiles);
 
       if (uniqueIncomingFiles.length === 0) {
         return prevFiles;
@@ -96,7 +105,9 @@ export const useFileListState = () => {
         },
         url: file.url,
       }));
-      return [...prevFiles, ...newServerFiles];
+      const updatedFiles = [...prevFiles, ...newServerFiles];
+      log('insertServerFiles:', updatedFiles);
+      return updatedFiles;
     });
   }, []);
 
@@ -105,10 +116,11 @@ export const useFileListState = () => {
     setFiles((prev) => {
       const removedFile = prev.find((file) => file.id === fileId);
       if (removedFile?.type === 'local' && removedFile.previewUrl) {
-        console.log('🚀 | removeFile | removedFile:', removedFile);
         URL.revokeObjectURL(removedFile.previewUrl);
       }
-      return prev.filter((file) => file.id !== fileId);
+      const updatedFiles = prev.filter((file) => file.id !== fileId);
+      log('removeFile:', updatedFiles);
+      return updatedFiles;
     });
   }, []);
 
@@ -119,6 +131,7 @@ export const useFileListState = () => {
         URL.revokeObjectURL(file.previewUrl);
       }
     });
+    log('resetFiles:', []);
     setFiles([]);
   }, [files]);
 

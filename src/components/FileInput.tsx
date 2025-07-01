@@ -6,9 +6,11 @@ import { cn } from '@/lib/utils';
 export default function FileInput({
   insertLocalFiles,
   className,
+  ...props
 }: {
   insertLocalFiles: (files: FileList) => void;
   className?: string;
+  [key: string]: unknown;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -16,6 +18,7 @@ export default function FileInput({
     <div className={cn(className)}>
       <Input
         type='file'
+        {...props}
         multiple
         onChange={(e) => {
           if (e.target.files) {

@@ -15,28 +15,27 @@ import path from 'path';
  * 파일 리스트 아이템 상태 관리
  * @param file 파일 데이터
  * @param removeFile 파일 삭제 함수
- * @param abort 파일 중단 함수
  * @param updateFile 파일 상태 업데이트 함수
  */
 function FileListItem({
   file,
   removeFile,
-  abort,
   updateFile,
+  abort,
 }: {
   file: FileData;
   removeFile: (id: string) => void;
-  abort: (id: string) => void;
   updateFile: (id: string, status: Partial<FileTransferInfo>) => void;
+  abort: (id: string) => void;
 }) {
   const t = useTranslations('upload');
+
   let src = '';
   if (file.type === 'server' && file.url) {
     src = path.join(process.env.NEXT_PUBLIC_URL!, file.url);
   } else if (file.type === 'local' && file.previewUrl) {
     src = file.previewUrl;
   }
-  console.log('🚀 | src:', src);
 
   return (
     <Card className='p-3 sm:p-4 group' id={`file-list-item-${file.id}`}>
@@ -68,11 +67,13 @@ function FileListItem({
           </p>
 
           {/* 업로드 진행률 */}
-          {file.type === 'local' && file.transfer?.status === 'uploading' && file.transfer?.progress !== undefined && (
-            <div className='mt-1 w-full'>
-              <Progress value={file.transfer.progress} />
-            </div>
-          )}
+          {file.type === 'local' &&
+            file.transfer?.status === 'uploading' &&
+            file.transfer?.progress !== undefined && (
+              <div className='mt-1 w-full'>
+                <Progress value={file.transfer.progress} />
+              </div>
+            )}
         </div>
 
         {/* 상태 배지 */}
@@ -147,7 +148,9 @@ function FileListItem({
             variant='ghost'
             size='sm'
             className='h-8 w-8 p-0'
-            disabled={file.type === 'local' && file.transfer?.status === 'uploading'}
+            disabled={
+              file.type === 'local' && file.transfer?.status === 'uploading'
+            }
             onClick={() => removeFile(file.id)}
           >
             <X />

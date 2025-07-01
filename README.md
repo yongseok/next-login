@@ -101,6 +101,10 @@ https://formatjs.github.io/docs/core-concepts/icu-syntax
 - [ ] cookie, session 로직 확인
 - [ ] next-auth strategy `database`로 전환  
 
+**2025.06.29**  
+- [X] fileupload 컴포넌트 안에 파일 전송 기능 합치기
+> [[🤔 파일전송 status 관리 전략.md]] 참조
+
 **추가 작업**  
 
 - [ ] 세션 관리

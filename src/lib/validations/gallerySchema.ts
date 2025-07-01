@@ -9,6 +9,11 @@ const fileInfoSchema = z.object({
   size: z.number(),
 });
 
+const transferFileSchema = z.object({
+  id: z.string(),
+  info: fileInfoSchema,
+});
+
 const localFileSchema = z.object({
   id: z.string(),
   type: z.literal('local'),
@@ -40,7 +45,7 @@ export const gallerySchema = z.object({
       `설명은 ${DESCRIPTION_MAX_LENGTH}자 이하로 입력해주세요.`
     )
     .optional(),
-  fileList: z.array(fileDataSchema),
+  fileList: z.array(transferFileSchema),
 });
 
 export type GalleryFormValues = z.infer<typeof gallerySchema>;

@@ -23,10 +23,38 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import type { FileData } from '@/types/gallery';
-import { useFileUpload } from '@/lib/swr/useFileUpload';
+import type { FileData, FileTransferInfo } from '@/types/gallery';
 import FileListItem from '@/app/[locale]/gallery/upload/components/FileListItem';
 import FileInput from '@/components/FileInput';
+import { useFileUpload } from '@/lib/swr/useFileUpload';
+import React from 'react';
+
+// FileList 컴포넌트 분리 및 memo 적용
+const FileList = React.memo(function FileList({
+  files,
+  removeFile,
+  updateFile,
+  abort,
+}: {
+  files: FileData[];
+  removeFile: (id: string) => void;
+  updateFile: (id: string, status: Partial<FileTransferInfo>) => void;
+  abort: (id: string) => void;
+}) {
+  return (
+    <div className='flex flex-col gap-2'>
+      {files.map((file) => (
+        <FileListItem
+          key={file.id}
+          file={file}
+          removeFile={removeFile}
+          updateFile={updateFile}
+          abort={abort}
+        />
+      ))}
+    </div>
+  );
+});
 
 export default function GalleryEditPage() {
   const { id } = useParams();
@@ -44,6 +72,9 @@ export default function GalleryEditPage() {
   const {
     handleSubmit,
     formState: { errors },
+    setValue,
+    getValues,
+    reset,
   } = form;
 
   /** 파일 상태 관리 **/
@@ -61,34 +92,34 @@ export default function GalleryEditPage() {
   /** 서버에서 가져온 파일 추가 **/
   useEffect(() => {
     if (gallery) {
-      insertServerFiles(
-        gallery.files.map(
-          (file: {
-            id: string;
-            filename: string;
-            mimetype: string;
-            size: number;
-            url: string;
-          }) => ({
-            id: file.id,
-            info: {
-              filename: file.filename,
-              mimetype: file.mimetype,
-              size: file.size,
-            },
-            url: file.url,
-          })
-        )
+      insertServerFiles(gallery.files);
+      reset(
+        {
+          title: gallery.title,
+          description: gallery.description,
+          fileList: gallery.files,
+        },
+        {
+          // keepValues: true,
+        }
       );
     }
-  }, [gallery, insertServerFiles]);
+  }, [gallery, reset, insertServerFiles]);
 
   /** 로컬에서 선택한 파일 추가 **/
   useEffect(() => {
-    if (files) {
-      form.setValue('fileList', files);
-    }
-  }, [files, form]);
+    const f = getValues('fileList');
+    const newFileList = files.filter(
+      (file) =>
+        !f.some(
+          (f) =>
+            f.info.filename === file.info.filename &&
+            f.info.mimetype === file.info.mimetype &&
+            f.info.size === file.info.size
+        )
+    );
+    setValue('fileList', [...f, ...newFileList]);
+  }, [files, getValues, setValue]);
 
   /** 로컬에서 선택한 파일 업로드 **/
   useEffect(() => {
@@ -104,9 +135,33 @@ export default function GalleryEditPage() {
     }
   }, [files, trigger, updateTransfer]);
 
+  /** 파일 전송 상태 업데이트 **/
+  useEffect(() => {
+    // const prev = getValues('fileList');
+    // const newList = prev.map((prevFile) => {
+    //   const file = files.find((f) => f.id === prevFile.id);
+    //   return file || prevFile;
+    // });
+    // console.log('🚀 | GalleryEditPage | newList:', newList);
+
+    setValue(
+      'fileList',
+      files,
+      { shouldValidate: false }
+    );
+  }, [files, setValue, getValues]);
+
   /** 폼 제출 **/
   const onSubmit = (data: GalleryFormValues) => {
     console.log('🚀 | GalleryEditPage | data:', data);
+    const formData = new FormData();
+    formData.append('title', data.title);
+    formData.append('description', data.description || '');
+    formData.append('fileList', JSON.stringify(data.fileList));
+    fetch(`/api/galleries/${id}`, {
+      method: 'PATCH',
+      body: formData,
+    });
   };
 
   if (isLoading) {
@@ -173,35 +228,38 @@ export default function GalleryEditPage() {
             )}
           />
           {/* 파일 리스트 */}
-          <FormField
+          {/* <FormField
             control={form.control}
             name='fileList'
-            render={({ field }) => {
+            render={() => {
               return (
-                <div className='flex flex-col gap-2'>
-                  {(field.value as unknown[] as FileData[])?.map((file) => {
-                    if (!file.type || !file.info) return null;
-                    return (
-                      <FileListItem
-                        key={file.id}
-                        file={file}
-                        removeFile={removeFile}
-                        updateFile={updateTransfer}
-                        abort={abort}
-                      />
-                    );
-                  })}
-                </div>
+                <FileList
+                  files={files}
+                  removeFile={removeFile}
+                  updateFile={updateTransfer}
+                  abort={abort}
+                />
               );
             }}
+          /> */}
+          {/* <input {...form.register('fileList')} type='hidden' /> */}
+          <FileList
+            files={files}
+            removeFile={removeFile}
+            updateFile={updateTransfer}
+            abort={abort}
           />
           <div className='flex flex-col sm:flex-row gap-4 justify-end content-center'>
             {/* 파일 추가 영역 */}
             <FileInput
+              {...form.register('fileList')}
               insertLocalFiles={insertLocalFiles}
             />
             {/* 제출 버튼 */}
-            <Button className='flex w-full sm:w-auto justify-center content-center' type='submit'>
+            <Button
+              className='flex w-full sm:w-auto justify-center content-center'
+              type='submit'
+            >
               Submit
             </Button>
           </div>

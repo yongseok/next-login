@@ -17,6 +17,7 @@ export function createApiErrorResponse(
       error.message,
       error.flatten().fieldErrors
     );
+    console.log('🚀 | error.flatten().fieldErrors:', error);
     return createApiErrorResponse(validationError, isProd);
   }
 
