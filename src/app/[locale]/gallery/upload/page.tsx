@@ -22,6 +22,7 @@ import { FileData } from '@/types/gallery';
 import FileInput from '@/components/FileInput';
 import useFileInputDragDrop from '@/lib/hooks/useFileInputDragDrop';
 import FileInputDragDrop from '@/components/FileInputDragDrop';
+import { CLIENT_ROUTES } from '@/lib/config/clientRoutes';
 
 type FormData = {
   title: string;
@@ -159,8 +160,7 @@ export default function UploadPage() {
     });
     if (response.ok) {
       const data = await response.json();
-      console.log('🚀 | onSubmit | response:', data);
-      router.push(`/gallery/detail/${data.id}`);
+      router.push(CLIENT_ROUTES.GALLERY.DETAIL(data.id));
       toast.success('갤러리 정보를 성공적으로 제출했습니다. (콘솔 로그 확인)');
     } else {
       toast.error('갤러리 정보 제출에 실패했습니다. 다시 시도해주세요.');

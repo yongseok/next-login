@@ -1,5 +1,5 @@
 import useSWRMutation from 'swr/mutation';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS } from '../config/apiEndpoints';
 import { FileData, FileTransferInfo } from '@/types/gallery';
 import { uploadFileWithPreview } from './fetcher';
 import { useCallback, useRef } from 'react';

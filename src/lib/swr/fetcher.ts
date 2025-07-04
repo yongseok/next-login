@@ -47,3 +47,8 @@ export const getGalleryById = async (url: string) => {
   const response = await fetch(url);
   return response.json();
 };
+
+export const getGalleries = async (url: string) => {
+  const response = await fetch(url);
+  return response.json();
+};

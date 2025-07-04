@@ -37,7 +37,7 @@ class GalleryService {
     page: number,
     limit: number,
     orderBy: Prisma.GalleryOrderByWithRelationInput
-  ): Promise<Gallery[]> {
+  ): Promise<{ data: Gallery[]; total: number }> {
     return this.galleryRepo.getPagedGalleries(page, limit, orderBy);
   }
 

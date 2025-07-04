@@ -52,12 +52,16 @@ export class GalleryRepository {
     page: number,
     limit: number,
     orderBy: Prisma.GalleryOrderByWithRelationInput = { createdAt: 'desc' }
-  ): Promise<Gallery[]> {
-    return this.prisma.gallery.findMany({
-      skip: (page - 1) * limit,
-      take: limit,
-      orderBy,
-    });
+  ): Promise<{ data: Gallery[]; total: number }> {
+    const [galleries, total] = await Promise.all([
+      this.prisma.gallery.findMany({
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy,
+      }),
+      this.prisma.gallery.count(),
+    ]);
+    return { data: galleries, total };
   }
 
   async getAllGalleries(): Promise<Gallery[]> {

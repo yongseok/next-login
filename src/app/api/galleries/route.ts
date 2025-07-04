@@ -53,3 +53,25 @@ export const POST = withApiErrorHandler(async (request: NextRequest) => {
 
   return NextResponse.json(gallery, { status: 201 });
 });
+
+export const GET = withApiErrorHandler(async (request: NextRequest) => {
+  const searchParams = request.nextUrl.searchParams;
+  const page = searchParams.get('page') || 1;
+  const limit = searchParams.get('limit') || 10;
+  const { data: galleries, total } = await galleryService.getPagedGalleries(
+    Number(page),
+    Number(limit),
+    {
+      createdAt: 'desc',
+    }
+  );
+  return NextResponse.json(
+    {
+      data: galleries,
+      page: Number(page),
+      limit: Number(limit),
+      total,
+    },
+    { status: 200 }
+  );
+});

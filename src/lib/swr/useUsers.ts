@@ -1,5 +1,5 @@
 import { useSession } from 'next-auth/react';
-import { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS } from '../config/apiEndpoints';
 import { getUserByEmail, updateUser } from './fetcher';
 import useSWRMutation from 'swr/mutation';
 import { UserUpdateDto } from '../validations/userUpdateSchema';

@@ -1,11 +1,13 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@/app/globals.css';
-import { MainNavigation } from '@/components/MainNavigation';
 import { Toaster } from '@/components/ui/sonner';
 import { NextIntlClientProvider } from 'next-intl';
 import { notFound } from 'next/navigation';
 import { MainProvider } from '@/app/MainProvider';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/app-sidebar';
+import { AppHeader } from '@/components/app-header';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -43,11 +45,16 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <MainProvider>
-          <NextIntlClientProvider messages={messages}>
-            <MainNavigation />
-            {children}
-            <Toaster />
-          </NextIntlClientProvider>
+          <SidebarProvider>
+            <AppSidebar />
+            <NextIntlClientProvider messages={messages}>
+              <SidebarInset>
+                <AppHeader />
+                {children}
+                <Toaster />
+              </SidebarInset>
+            </NextIntlClientProvider>
+          </SidebarProvider>
         </MainProvider>
       </body>
     </html>
